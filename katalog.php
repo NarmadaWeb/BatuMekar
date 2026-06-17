@@ -43,11 +43,13 @@ if ($search) {
                     <?php endif; ?>
                     <ul style="list-style: none; padding: 0;">
                         <?php
-                        $categories = ['Multiflora', 'Kaliandra', 'Rambutan', 'Hutan', 'Kelengkeng'];
-                        foreach ($categories as $cat): ?>
+                        $categories = $pdo->query("SELECT * FROM kategori ORDER BY nama_kategori")->fetchAll();
+                        foreach ($categories as $cat):
+                            $cat_name = $cat['nama_kategori'];
+                        ?>
                         <li style="margin-bottom: 12px;">
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="category" value="<?php echo e($cat); ?>" <?php echo $selected_cat === $cat ? 'checked' : ''; ?> onchange="this.form.submit()"> <span><?php echo e($cat); ?></span>
+                                <input type="radio" name="category" value="<?php echo e($cat_name); ?>" <?php echo $selected_cat === $cat_name ? 'checked' : ''; ?> onchange="this.form.submit()"> <span><?php echo e($cat_name); ?></span>
                             </label>
                         </li>
                         <?php endforeach; ?>
@@ -83,18 +85,25 @@ if ($search) {
                 <?php endif; ?>
 
                 <div class="grid grid-3">
-                    <?php foreach ($filtered as $product): ?>
+                    <?php foreach ($filtered as $product):
+                        $p_sizes_katalog = get_product_sizes($pdo, $product['produk_id']);
+                    ?>
                     <div class="card" style="padding: 0; overflow: hidden;">
                         <a href="produk.php?id=<?php echo e($product['produk_id']); ?>">
                             <img src="<?php echo e($product['gambar']); ?>" alt="<?php echo e($product['nama']); ?>" style="width: 100%; height: 250px; object-fit: cover;">
                         </a>
                         <div style="padding: 24px;">
                             <h3 class="text-secondary"><a href="produk.php?id=<?php echo e($product['produk_id']); ?>"><?php echo e($product['nama']); ?></a></h3>
+                            <?php if (!empty($p_sizes_katalog)): ?>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0;">
+                                <?php foreach ($p_sizes_katalog as $s): ?>
+                                <span style="background: #eff6ff; color: #2563eb; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;"><?php echo e($s['ukuran_ml']); ?>ml</span>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
                             <p class="text-primary" style="font-weight: 700; margin: 8px 0;"><?php echo e(format_rupiah($product['harga'])); ?></p>
-                            <form action="keranjang.php" method="POST">
-                                <input type="hidden" name="action" value="add">
-                                <input type="hidden" name="product_id" value="<?php echo e($product['produk_id']); ?>">
-                                <button type="submit" class="btn btn-primary" style="width: 100%;">Beli</button>
+                            <form action="produk.php?id=<?php echo e($product['produk_id']); ?>" method="GET">
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">Lihat & Pilih Ukuran</button>
                             </form>
                         </div>
                     </div>

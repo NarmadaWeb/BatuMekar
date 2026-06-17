@@ -15,7 +15,7 @@ $orders = $stmt->fetchAll();
 $orders_with_items = [];
 foreach ($orders as $order) {
     $stmt_items = $pdo->prepare("
-        SELECT oi.detail_pesanan_id, oi.pesanan_id, oi.produk_id, oi.jumlah as quantity, oi.harga as price, p.nama as product_name, p.gambar as product_image 
+        SELECT oi.detail_pesanan_id, oi.pesanan_id, oi.produk_id, oi.ukuran_id, oi.jumlah as quantity, oi.harga as price, p.nama as product_name, p.gambar as product_image 
         FROM detail_pesanan oi
         JOIN produk p ON oi.produk_id = p.produk_id
         WHERE oi.pesanan_id = ?
@@ -132,7 +132,13 @@ require_once __DIR__ . '/../includes/header.php';
                                 </button>
                                 
                                 <div id="items-list-<?php echo $order['pesanan_id']; ?>" class="order-items-list" style="display: none; flex-direction: column; gap: 12px; margin-top: 16px; background: #f8fafc; padding: 16px; border-radius: 10px; border: 1px solid #e2e8f0;">
-                                    <?php foreach ($order['items'] as $item): ?>
+                                    <?php foreach ($order['items'] as $item):
+                                        $size_label = '';
+                                        if (!empty($item['ukuran_id'])) {
+                                            $size_info = get_size_by_id($pdo, $item['ukuran_id']);
+                                            if ($size_info) $size_label = $size_info['ukuran_ml'] . ' ml';
+                                        }
+                                    ?>
                                     <div class="order-item-row" style="display: flex; justify-content: space-between; align-items: center; gap: 16px;">
                                         <div class="order-item-info" style="display: flex; align-items: center; gap: 12px;">
                                             <?php if (!empty($item['product_image'])): ?>
@@ -140,7 +146,10 @@ require_once __DIR__ . '/../includes/header.php';
                                             <?php endif; ?>
                                             <div>
                                                 <div style="font-weight: 600; color: var(--on-surface); font-size: 14px;"><?php echo e($item['product_name']); ?></div>
-                                                <div style="font-size: 12px; color: var(--on-surface-variant);"><?php echo e($item['quantity']); ?> x <?php echo e(format_rupiah($item['price'])); ?></div>
+                                                <div style="font-size: 12px; color: var(--on-surface-variant);">
+                                                    <?php if ($size_label): ?><span style="color: #2563eb; font-weight: 600;"><?php echo e($size_label); ?></span> &middot; <?php endif; ?>
+                                                    <?php echo e($item['quantity']); ?> x <?php echo e(format_rupiah($item['price'])); ?>
+                                                </div>
                                             </div>
                                         </div>
                                         <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">

@@ -14,9 +14,26 @@ try {
         dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (pesanan_id) REFERENCES pesanan(pesanan_id) ON DELETE SET NULL
     )");
-} catch (PDOException $e) {
-    // ignore
-}
+} catch (PDOException $e) {}
+
+try {
+    $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN ukuran_id INTEGER DEFAULT NULL");
+} catch (PDOException $e) {}
+
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ukuran_produk (
+        ukuran_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produk_id INTEGER NOT NULL,
+        ukuran_ml INTEGER NOT NULL,
+        harga REAL DEFAULT NULL,
+        stok INTEGER DEFAULT 0,
+        FOREIGN KEY (produk_id) REFERENCES produk(produk_id) ON DELETE CASCADE
+    )");
+} catch (PDOException $e) {}
+
+try {
+    $pdo->exec("ALTER TABLE pesanan ADD COLUMN snap_token TEXT DEFAULT NULL");
+} catch (PDOException $e) {}
 
 $msg = '';
 $error = '';
@@ -42,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 $status_filter = $_GET['status'] ?? '';
 $search = trim($_GET['search'] ?? '');
 
-$sql = "SELECT pesanan.*, pengguna.nama as user_name, pengguna.email as user_email, pengguna.telepon as user_phone FROM pesanan JOIN pengguna ON pesanan.pengguna_id = pengguna.pengguna_id";
+$sql = "SELECT pesanan.*, pengguna.nama as user_name, pengguna.username as user_username, pengguna.telepon as user_phone FROM pesanan JOIN pengguna ON pesanan.pengguna_id = pengguna.pengguna_id";
 $conditions = [];
 $params = [];
 
@@ -74,6 +91,16 @@ foreach ($orders as $order) {
         JOIN produk p ON oi.produk_id = p.produk_id
         WHERE oi.pesanan_id = ?
     ");
+    // Add size info
+    foreach ($order['items'] as &$item) {
+        $size_label = '';
+        if (!empty($item['ukuran_id'])) {
+            $size_info = get_size_by_id($pdo, $item['ukuran_id']);
+            if ($size_info) $size_label = $size_info['ukuran_ml'] . ' ml';
+        }
+        $item['ukuran_label'] = $size_label;
+    }
+    unset($item);
     $stmt_items->execute([$order['pesanan_id']]);
     $order['items'] = $stmt_items->fetchAll();
     $orders_with_items[] = $order;
@@ -244,7 +271,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <div style="font-size: 12px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Data Pelanggan</div>
                                     <div style="font-size: 14px; color: var(--on-surface-variant); line-height: 1.8;">
                                         <strong>Nama:</strong> <?php echo e($order['user_name']); ?><br>
-                                        <strong>Email:</strong> <?php echo e($order['user_email']); ?><br>
+                                        <strong>Username:</strong> <?php echo e($order['user_username']); ?><br>
                                         <strong>Telepon:</strong> <?php echo e($order['user_phone'] ?: '-'); ?>
                                     </div>
                                 </div>
@@ -274,7 +301,10 @@ require_once __DIR__ . '/../includes/header.php';
                                         <?php endif; ?>
                                         <div>
                                             <div style="font-weight: 600; color: #334155; font-size: 14px;"><?php echo e($item['product_name']); ?></div>
-                                            <div style="font-size: 12px; color: #94a3b8;"><?php echo e($item['jumlah']); ?> x <?php echo e(format_rupiah($item['harga'])); ?></div>
+                                            <div style="font-size: 12px; color: #94a3b8;">
+                                                <?php if ($item['ukuran_label']): ?><span style="color: #2563eb; font-weight: 600;"><?php echo e($item['ukuran_label']); ?></span> &middot; <?php endif; ?>
+                                                <?php echo e($item['jumlah']); ?> x <?php echo e(format_rupiah($item['harga'])); ?>
+                                            </div>
                                         </div>
                                     </div>
                                     <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">

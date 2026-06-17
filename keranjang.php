@@ -9,21 +9,34 @@ require_once 'config/db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     $product_id = (int)($_POST['product_id'] ?? 0);
+    $ukuran_id = (int)($_POST['ukuran_id'] ?? 0);
 
     if ($action === 'add' && $product_id > 0) {
-        if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id]++;
+        $cart_key = $product_id . '_' . $ukuran_id;
+        if (isset($_SESSION['cart'][$cart_key])) {
+            $_SESSION['cart'][$cart_key]++;
         } else {
-            $_SESSION['cart'][$product_id] = 1;
+            $_SESSION['cart'][$cart_key] = 1;
         }
-    } elseif ($action === 'remove' && $product_id > 0) {
-        unset($_SESSION['cart'][$product_id]);
-    } elseif ($action === 'update' && $product_id > 0) {
-        $qty = (int)($_POST['quantity'] ?? 1);
-        if ($qty > 0) {
-            $_SESSION['cart'][$product_id] = $qty;
+    } elseif ($action === 'remove') {
+        if ($ukuran_id > 0) {
+            unset($_SESSION['cart'][$product_id . '_' . $ukuran_id]);
         } else {
-            unset($_SESSION['cart'][$product_id]);
+            // Remove all entries for this product
+            foreach ($_SESSION['cart'] as $key => $qty) {
+                $parts = explode('_', $key);
+                if ((int)$parts[0] === $product_id) {
+                    unset($_SESSION['cart'][$key]);
+                }
+            }
+        }
+    } elseif ($action === 'update') {
+        $qty = (int)($_POST['quantity'] ?? 1);
+        $cart_key = $product_id . '_' . $ukuran_id;
+        if ($qty > 0) {
+            $_SESSION['cart'][$cart_key] = $qty;
+        } else {
+            unset($_SESSION['cart'][$cart_key]);
         }
     } elseif ($action === 'clear') {
         $_SESSION['cart'] = [];
@@ -32,30 +45,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
+// Migrate old cart format (just product_id key) to new format
+if (!empty($_SESSION['cart'])) {
+    $migrated = false;
+    foreach ($_SESSION['cart'] as $key => $qty) {
+        if (is_numeric($key)) {
+            $_SESSION['cart'][$key . '_0'] = $qty;
+            unset($_SESSION['cart'][$key]);
+            $migrated = true;
+        }
+    }
+    if ($migrated) {
+        header('Location: keranjang.php');
+        exit;
+    }
+}
+
 $page_title = 'Keranjang Belanja';
 require_once 'includes/header.php';
 
-$cart_items = [];
-$subtotal = 0;
-if (!empty($_SESSION['cart'])) {
-    $ids = array_keys($_SESSION['cart']);
-    $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("SELECT * FROM produk WHERE produk_id IN ($placeholders)");
-    $stmt->execute($ids);
-    $products = $stmt->fetchAll();
-
-    foreach ($products as $p) {
-        $qty = $_SESSION['cart'][$p['produk_id']];
-        $total = $p['harga'] * $qty;
-        $subtotal += $total;
-        $cart_items[] = array_merge($p, ['qty' => $qty, 'total' => $total]);
-    }
-}
+list($cart_items, $subtotal, $item_count) = calculate_cart_totals($pdo);
 
 $shipping_cost = 25000;
 $admin_fee = 2000;
 $grand_total = $subtotal + $shipping_cost + $admin_fee;
-$item_count = array_sum($_SESSION['cart'] ?? []);
 ?>
 <main class="py-xl">
     <div class="container">
@@ -104,23 +117,27 @@ $item_count = array_sum($_SESSION['cart'] ?? []);
                     </div>
 
                     <div style="flex: 1; min-width: 0;">
-                        <a href="produk.php?id=<?php echo e($item['produk_id']); ?>" style="font-size: 16px; font-weight: 700; color: var(--secondary); text-decoration: none; display: block; margin-bottom: 4px;"><?php echo e($item['nama']); ?></a>
+                        <a href="produk.php?id=<?php echo e($item['produk_id']); ?>" style="font-size: 16px; font-weight: 700; color: var(--secondary); text-decoration: none; display: block; margin-bottom: 2px;"><?php echo e($item['nama']); ?></a>
+                        <?php if ($item['ukuran_label']): ?>
+                            <span style="display: inline-block; background: #eff6ff; color: #2563eb; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 6px;"><?php echo e($item['ukuran_label']); ?></span>
+                        <?php endif; ?>
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                             <?php if ($item['kategori']): ?>
                                 <span style="background: #f1f5f9; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #64748b;"><?php echo e($item['kategori']); ?></span>
                             <?php endif; ?>
-                            <span style="font-size: 15px; font-weight: 700; color: var(--primary);"><?php echo e(format_rupiah($item['harga'])); ?></span>
+                            <span style="font-size: 15px; font-weight: 700; color: var(--primary);"><?php echo e(format_rupiah($item['size_price'])); ?></span>
                         </div>
 
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <form action="keranjang.php" method="POST" style="display: flex; align-items: center; gap: 0; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="product_id" value="<?php echo e($item['produk_id']); ?>">
+                                <input type="hidden" name="ukuran_id" value="<?php echo e($item['ukuran_id']); ?>">
                                 <button type="submit" name="quantity" value="<?php echo e($item['qty'] - 1); ?>" style="padding: 6px 10px; border: none; background: #f8fafc; cursor: pointer; color: #475569; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">remove</span>
                                 </button>
                                 <span style="padding: 6px 12px; font-weight: 700; font-size: 14px; min-width: 32px; text-align: center; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;"><?php echo e($item['qty']); ?></span>
-                                <?php $max_qty = $item['stok']; ?>
+                                <?php $max_qty = $item['size_stok']; ?>
                                 <button type="submit" name="quantity" value="<?php echo e(min($item['qty'] + 1, $max_qty)); ?>" style="padding: 6px 10px; border: none; background: #f8fafc; cursor: pointer; color: #475569; display: flex; align-items: center; transition: background 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'" <?php echo $item['qty'] >= $max_qty ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''; ?>>
                                     <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
                                 </button>
@@ -129,6 +146,7 @@ $item_count = array_sum($_SESSION['cart'] ?? []);
                             <form action="keranjang.php" method="POST" onsubmit="return confirm('Hapus <?php echo e($item['nama']); ?> dari keranjang?')" style="margin: 0;">
                                 <input type="hidden" name="action" value="remove">
                                 <input type="hidden" name="product_id" value="<?php echo e($item['produk_id']); ?>">
+                                <input type="hidden" name="ukuran_id" value="<?php echo e($item['ukuran_id']); ?>">
                                 <button type="submit" style="padding: 6px 10px; border: 1px solid #fecaca; border-radius: 8px; background: #fef2f2; color: #dc2626; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">delete</span> Hapus
                                 </button>

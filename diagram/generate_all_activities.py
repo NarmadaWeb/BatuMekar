@@ -82,6 +82,14 @@ class DrawioDiagramBuilder:
                 for (px, py) in e["points"]:
                     ET.SubElement(arr, "mxPoint", x=str(px), y=str(py))
 
+        # Add transparent Frame node for headless renderer cropping bounding box
+        frame_cell = ET.SubElement(root, "mxCell", id="frame", value="",
+                                   style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;",
+                                   vertex="1", parent="1")
+        geom_frame = ET.SubElement(frame_cell, "mxGeometry", x="0", y="0",
+                                   width=str(self.width), height=str(self.height))
+        geom_frame.set("as", "geometry")
+
         raw = ET.tostring(mxfile, encoding="utf-8")
         dom = minidom.parseString(raw)
         pretty_xml = dom.toprettyxml(indent="    ")
@@ -95,136 +103,122 @@ class DrawioDiagramBuilder:
             f.write(out_content)
 
 
+def build_cascading_crud(b, entity_name):
+    # Swimlanes
+    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 400, 990)
+    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 460, 40, 400, 990)
+    
+    # Vertices
+    b.add_node("start", "", b.ST_START, 295, 60, 30, 30)
+    b.add_node("a_pilih_menu", f"Pilih menu {entity_name}", b.ST_ACTION, 220, 110, 180, 55)
+    b.add_node("s_tampil_data", f"Tampil data {entity_name}", b.ST_ACTION, 570, 170, 180, 55)
+    
+    # Tambah Row
+    b.add_node("d_tambah", "Tambah", b.ST_RHOMBUS, 80, 250, 100, 75)
+    b.add_node("s_form_tambah", "Tampil form tambah", b.ST_ACTION, 570, 260, 180, 55)
+    b.add_node("a_tambah_data", "Tambah data", b.ST_ACTION, 220, 335, 180, 55)
+    b.add_node("d_simpan_tambah", "Simpan", b.ST_RHOMBUS, 260, 410, 100, 75)
+    b.add_node("s_data_disimpan_tambah", "Data disimpan", b.ST_ACTION, 570, 420, 180, 55)
+    
+    # Ubah Row
+    b.add_node("d_ubah", "Ubah", b.ST_RHOMBUS, 80, 505, 100, 75)
+    b.add_node("a_pilih_ubah", "Pilih data yang di ubah" if entity_name == "pengguna" else "Pilih data yang diubah", b.ST_ACTION, 220, 515, 180, 55)
+    b.add_node("s_form_ubah", "Tampil form ubah", b.ST_ACTION, 570, 515, 180, 55)
+    b.add_node("a_ubah_data", "Ubah data", b.ST_ACTION, 220, 590, 180, 55)
+    b.add_node("d_simpan_ubah", "Simpan", b.ST_RHOMBUS, 260, 665, 100, 75)
+    b.add_node("s_data_disimpan_ubah", "Data disimpan", b.ST_ACTION, 570, 675, 180, 55)
+    
+    # Hapus Row
+    b.add_node("d_hapus", "Hapus", b.ST_RHOMBUS, 80, 760, 100, 75)
+    b.add_node("a_pilih_hapus", "Pilih data yang akan dihapus", b.ST_ACTION, 220, 770, 180, 55)
+    b.add_node("d_yakin_hapus", "yakin hapus", b.ST_RHOMBUS, 260, 845, 100, 75)
+    b.add_node("s_data_dihapus", "Data dihapus", b.ST_ACTION, 570, 855, 180, 55)
+    
+    # End node
+    b.add_node("final", "", b.ST_END_OUTER, 295, 960, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 302, 967, 16, 16)
+    
+    # Edges
+    b.link_nodes("start", "a_pilih_menu")
+    b.link_nodes("a_pilih_menu", "s_tampil_data", exit_pt=(0.5, 1), entry_pt=(0, 0.5), points=[(310, 197.5)])
+    b.link_nodes("s_tampil_data", "d_tambah", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(130, 197.5)])
+    
+    # Tambah Flow Connections
+    b.link_nodes("d_tambah", "s_form_tambah", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_tambah", "d_ubah", label="T", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
+    b.link_nodes("s_form_tambah", "a_tambah_data", exit_pt=(0.5, 1), entry_pt=(1, 0.5), points=[(660, 362.5)])
+    b.link_nodes("a_tambah_data", "d_simpan_tambah")
+    b.link_nodes("d_simpan_tambah", "s_data_disimpan_tambah", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_simpan_tambah", "s_tampil_data", label="T", exit_pt=(0.5, 1), entry_pt=(1, 0.5), points=[(310, 495), (880, 495), (880, 197.5)])
+    b.link_nodes("s_data_disimpan_tambah", "s_tampil_data", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(880, 447.5), (880, 197.5)])
+    
+    # Ubah Flow Connections
+    b.link_nodes("d_ubah", "a_pilih_ubah", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_ubah", "d_hapus", label="T", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
+    b.link_nodes("a_pilih_ubah", "s_form_ubah")
+    b.link_nodes("s_form_ubah", "a_ubah_data", exit_pt=(0.5, 1), entry_pt=(1, 0.5), points=[(660, 617.5)])
+    b.link_nodes("a_ubah_data", "d_simpan_ubah")
+    b.link_nodes("d_simpan_ubah", "s_data_disimpan_ubah", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_simpan_ubah", "s_tampil_data", label="T", exit_pt=(0.5, 1), entry_pt=(1, 0.5), points=[(310, 750), (880, 750), (880, 197.5)])
+    b.link_nodes("s_data_disimpan_ubah", "s_tampil_data", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(880, 702.5), (880, 197.5)])
+    
+    # Hapus Flow Connections
+    b.link_nodes("d_hapus", "a_pilih_hapus", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_hapus", "final", label="T", exit_pt=(0.5, 1), entry_pt=(0, 0.5), points=[(130, 975)])
+    b.link_nodes("a_pilih_hapus", "d_yakin_hapus")
+    b.link_nodes("d_yakin_hapus", "s_data_dihapus", label="Y", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("d_yakin_hapus", "s_tampil_data", label="T", exit_pt=(0.5, 1), entry_pt=(1, 0.5), points=[(310, 930), (880, 930), (880, 197.5)])
+    b.link_nodes("s_data_dihapus", "s_tampil_data", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(880, 882.5), (880, 197.5)])
+
+
 def generate_activities(dest_dir):
-    # Clear directory first to keep it clean (exactly 10 files)
+    # Clear directory first to keep it clean (exactly 11 files)
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
     os.makedirs(dest_dir)
 
-    print("Generating 10 Activity Diagrams...")
+    print("Generating 11 Activity Diagrams...")
 
-    # ================== ADMIN DIAGRAMS (5 File) ==================
+    # ================== ADMIN DIAGRAMS (6 File) ==================
 
     # 1. Admin Login
-    b = DrawioDiagramBuilder("Activity Login Admin", "act-adm-login", 900, 650)
-    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 360, 560)
-    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 480, 40, 360, 560)
+    b = DrawioDiagramBuilder("Activity Login Admin", "act-adm-login", 900, 750)
+    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 360, 660)
+    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 480, 40, 360, 660)
     b.add_node("start", "", b.ST_START, 225, 80, 30, 30)
-    b.add_node("a1", "Mengakses Halaman Login Admin\ndan Mengisi Email & Password", b.ST_ACTION, 140, 140, 200, 55)
-    b.add_node("s1", "Memvalidasi Kredensial Admin", b.ST_ACTION, 560, 140, 200, 55)
-    b.add_node("dec", "Kredensial\nValid?", b.ST_RHOMBUS, 600, 230, 120, 75)
-    b.add_node("s2_err", "Menampilkan Pesan Error\nKredensial Salah", b.ST_ACTION, 560, 340, 200, 55)
-    b.add_node("s2_ok", "Membuat Session Admin\ndan Mengarahkan ke Dashboard", b.ST_ACTION, 560, 430, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 442, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 449, 16, 16)
+    b.add_node("masuk_web", "masuk Halaman web", b.ST_ACTION, 150, 140, 180, 55)
+    b.add_node("tampil_form", "tampil form Login", b.ST_ACTION, 570, 140, 180, 55)
+    b.add_node("input_kred", "memasukan username\ndan password", b.ST_ACTION, 150, 230, 180, 55)
+    b.add_node("klik_login", "klik Button Login", b.ST_ACTION, 150, 320, 180, 55)
+    b.add_node("validasi", "validasi", b.ST_RHOMBUS, 520, 317.5, 100, 60)
+    b.add_node("tampil_gagal", "tampil pesan gagal", b.ST_ACTION, 680, 320, 140, 55)
+    b.add_node("tampil_sukses", "tampil pesan\nberhasil login", b.ST_ACTION, 570, 420, 180, 55)
+    b.add_node("tampil_dashboard", "tampil Halaman\nDashboard", b.ST_ACTION, 570, 510, 180, 55)
+    b.add_node("final", "", b.ST_END_OUTER, 645, 600, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 652, 607, 16, 16)
     
-    b.link_nodes("start", "a1")
-    b.link_nodes("a1", "s1")
-    b.link_nodes("s1", "dec")
-    b.link_nodes("dec", "s2_ok", label="Ya")
-    b.link_nodes("dec", "s2_err", label="Tidak")
-    b.link_nodes("s2_err", "a1", points=[(780, 367), (780, 110), (240, 110)])
-    b.link_nodes("s2_ok", "final")
+    b.link_nodes("start", "masuk_web")
+    b.link_nodes("masuk_web", "tampil_form", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("tampil_form", "input_kred", exit_pt=(0, 0.5), entry_pt=(1, 0.5),
+                 points=[(450, 167.5), (450, 257.5)])
+    b.link_nodes("input_kred", "klik_login")
+    b.link_nodes("klik_login", "validasi", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("validasi", "tampil_gagal", label="T", exit_pt=(1, 0.5), entry_pt=(0, 0.5))
+    b.link_nodes("tampil_gagal", "tampil_form", exit_pt=(0.5, 0), entry_pt=(1, 0.5),
+                 points=[(750, 167.5)])
+    b.link_nodes("validasi", "tampil_sukses", label="Y", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
+    b.link_nodes("tampil_sukses", "tampil_dashboard")
+    b.link_nodes("tampil_dashboard", "final")
     b.save(os.path.join(dest_dir, "admin_login.drawio"))
 
     # 2. Admin Kelola Produk (CRUD)
-    b = DrawioDiagramBuilder("Activity Kelola Produk", "act-adm-kelola-prod", 1000, 950)
-    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 400, 860)
-    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 520, 40, 400, 860)
-    b.add_node("start", "", b.ST_START, 245, 80, 30, 30)
-    b.add_node("a1", "Membuka Halaman Kelola Produk", b.ST_ACTION, 160, 140, 200, 55)
-    b.add_node("s1", "Mengambil Data Produk & Menampilkan\nTabel Produk (Tambah, Edit, Hapus)", b.ST_ACTION, 620, 140, 200, 55)
-    b.add_node("dec_aksi", "Pilih Aksi?", b.ST_RHOMBUS, 200, 230, 120, 75)
-    
-    # Tambah Flow
-    b.add_node("a_tambah", "Mengisi Form & Kirim Produk Baru", b.ST_ACTION, 100, 340, 180, 55)
-    b.add_node("s_tambah", "Validasi, Upload Gambar &\nSimpan Produk Baru ke DB", b.ST_ACTION, 540, 340, 180, 55)
-    
-    # Edit Flow
-    b.add_node("a_edit", "Mengubah Data Form & Kirim Update", b.ST_ACTION, 100, 430, 180, 55)
-    b.add_node("s_edit", "Validasi & Update Data Produk di DB", b.ST_ACTION, 540, 430, 180, 55)
-    
-    # Hapus Flow
-    b.add_node("a_hapus", "Konfirmasi Hapus Produk", b.ST_ACTION, 100, 520, 180, 55)
-    b.add_node("s_hapus", "Hapus Data Produk dari DB &\nHapus Gambar di Server", b.ST_ACTION, 540, 520, 180, 55)
-    
-    # Done / Back Flow
-    b.add_node("a_kembali", "Kembali ke Dashboard", b.ST_ACTION, 100, 610, 180, 55)
-    
-    # Redirect state
-    b.add_node("s_refresh", "Me-refresh Halaman & Menampilkan Notifikasi Sukses", b.ST_ACTION, 620, 700, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 245, 712, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 252, 719, 16, 16)
-
-    b.link_nodes("start", "a1")
-    b.link_nodes("a1", "s1")
-    b.link_nodes("s1", "dec_aksi", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(720, 210), (260, 210)])
-    
-    # Routes from Decision Aksi
-    b.link_nodes("dec_aksi", "a_tambah", label="Tambah", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(190, 267)])
-    b.link_nodes("dec_aksi", "a_edit", label="Edit", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(190, 267)])
-    b.link_nodes("dec_aksi", "a_hapus", label="Hapus", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(190, 267)])
-    b.link_nodes("dec_aksi", "a_kembali", label="Kembali", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
-
-    # Link from actions to system processes
-    b.link_nodes("a_tambah", "s_tambah")
-    b.link_nodes("a_edit", "s_edit")
-    b.link_nodes("a_hapus", "s_hapus")
-    
-    # Link from processes to refresh
-    b.link_nodes("s_tambah", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(630, 410), (720, 410)])
-    b.link_nodes("s_edit", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(630, 500), (720, 500)])
-    b.link_nodes("s_hapus", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(630, 590), (720, 590)])
-    
-    # Loop back from refresh to table view
-    b.link_nodes("s_refresh", "s1", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(960, 727), (960, 167)])
-    
-    # End flow
-    b.link_nodes("a_kembali", "final")
-    
+    b = DrawioDiagramBuilder("Activity Kelola Produk", "act-adm-kelola-prod", 950, 1050)
+    build_cascading_crud(b, "produk")
     b.save(os.path.join(dest_dir, "admin_kelola_produk.drawio"))
 
-    # 3. Admin Kelola Kategori
-    b = DrawioDiagramBuilder("Activity Kelola Kategori", "act-adm-kelola-kat", 950, 850)
-    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 380, 760)
-    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 500, 40, 380, 760)
-    b.add_node("start", "", b.ST_START, 235, 80, 30, 30)
-    b.add_node("a1", "Membuka Halaman Kelola Kategori", b.ST_ACTION, 150, 140, 200, 55)
-    b.add_node("s1", "Mengambil Data & Menampilkan Daftar\nKategori dan Form Tambah", b.ST_ACTION, 590, 140, 200, 55)
-    b.add_node("dec_aksi", "Aksi Kategori?", b.ST_RHOMBUS, 190, 230, 120, 75)
-    
-    # Tambah Kategori
-    b.add_node("a_tambah", "Menginput Nama Kategori & Simpan", b.ST_ACTION, 110, 340, 180, 55)
-    b.add_node("s_tambah", "Memeriksa Keunikan Kategori & Simpan", b.ST_ACTION, 550, 340, 180, 55)
-    
-    # Hapus Kategori
-    b.add_node("a_hapus", "Konfirmasi Hapus Kategori", b.ST_ACTION, 110, 430, 180, 55)
-    b.add_node("s_hapus", "Hapus Kategori dari DB", b.ST_ACTION, 550, 430, 180, 55)
-    
-    # Kembali
-    b.add_node("a_kembali", "Kembali ke Dashboard", b.ST_ACTION, 110, 520, 180, 55)
-    
-    b.add_node("s_refresh", "Me-refresh Halaman Kategori", b.ST_ACTION, 590, 610, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 235, 622, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 242, 629, 16, 16)
-    
-    b.link_nodes("start", "a1")
-    b.link_nodes("a1", "s1")
-    b.link_nodes("s1", "dec_aksi", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(690, 210), (250, 210)])
-    
-    b.link_nodes("dec_aksi", "a_tambah", label="Tambah", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(150, 267)])
-    b.link_nodes("dec_aksi", "a_hapus", label="Hapus", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(150, 267)])
-    b.link_nodes("dec_aksi", "a_kembali", label="Kembali", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
-    
-    b.link_nodes("a_tambah", "s_tambah")
-    b.link_nodes("a_hapus", "s_hapus")
-    
-    b.link_nodes("s_tambah", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(640, 410), (690, 410)])
-    b.link_nodes("s_hapus", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(640, 500), (690, 500)])
-    
-    b.link_nodes("s_refresh", "s1", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(910, 637), (910, 167)])
-    b.link_nodes("a_kembali", "final")
-    
+    # 3. Admin Kelola Kategori (CRUD)
+    b = DrawioDiagramBuilder("Activity Kelola Kategori", "act-adm-kelola-kat", 950, 1050)
+    build_cascading_crud(b, "kategori")
     b.save(os.path.join(dest_dir, "admin_kelola_kategori.drawio"))
 
     # 4. Admin Kelola Pesanan
@@ -235,73 +229,33 @@ def generate_activities(dest_dir):
     b.add_node("a1", "Membuka Halaman Kelola Pesanan", b.ST_ACTION, 140, 140, 200, 55)
     b.add_node("s1", "Menampilkan Rincian Pesanan Masuk", b.ST_ACTION, 560, 140, 200, 55)
     b.add_node("a2", "Memeriksa Bukti Pembayaran Transaksi", b.ST_ACTION, 140, 230, 200, 55)
-    b.add_node("dec", "Pembayaran\nValid?", b.ST_RHOMBUS, 200, 310, 120, 75)
+    b.add_node("dec", "Pembayaran\nValid?", b.ST_RHOMBUS, 180, 310, 120, 75)
     b.add_node("s2_ok", "Mengubah Status ke 'Processed'/'Shipped'\ndan Update Stok Produk", b.ST_ACTION, 560, 320, 200, 55)
     b.add_node("s2_fail", "Mengubah Status ke 'Pending' / Menolak\ndan Memberi Alasan Tolak", b.ST_ACTION, 560, 420, 200, 55)
     b.add_node("s3_noti", "Mengirim Notifikasi Status ke Dashboard User", b.ST_ACTION, 560, 510, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 522, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 529, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 522.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 529.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
     b.link_nodes("s1", "a2")
     b.link_nodes("a2", "dec")
     b.link_nodes("dec", "s2_ok", label="Ya")
-    b.link_nodes("dec", "s2_fail", label="Tidak", exit_pt=(0.5, 1), entry_pt=(0, 0.5), points=[(260, 447)])
+    b.link_nodes("dec", "s2_fail", label="Tidak", exit_pt=(0.5, 1), entry_pt=(0, 0.5), points=[(240, 447.5)])
     b.link_nodes("s2_ok", "s3_noti")
-    b.link_nodes("s2_fail", "s3_noti", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(660, 490), (660, 500)])
+    b.link_nodes("s2_fail", "s3_noti")
     b.link_nodes("s3_noti", "final")
     b.save(os.path.join(dest_dir, "admin_kelola_pesanan.drawio"))
 
-    # 5. Admin Kelola Artikel Blog
-    b = DrawioDiagramBuilder("Activity Kelola Artikel", "act-adm-kelola-art", 950, 850)
-    b.add_node("lane_left", "Admin", b.ST_SWIMLANE, 60, 40, 380, 760)
-    b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 500, 40, 380, 760)
-    b.add_node("start", "", b.ST_START, 235, 80, 30, 30)
-    b.add_node("a1", "Membuka Halaman Kelola Artikel", b.ST_ACTION, 150, 140, 200, 55)
-    b.add_node("s1", "Mengambil Data & Menampilkan Daftar Artikel", b.ST_ACTION, 590, 140, 200, 55)
-    b.add_node("dec_aksi", "Aksi Artikel?", b.ST_RHOMBUS, 190, 230, 120, 75)
-    
-    # Tambah Artikel
-    b.add_node("a_tambah", "Mengisi Form & Kirim Artikel Baru", b.ST_ACTION, 110, 340, 180, 55)
-    b.add_node("s_tambah", "Validasi, Upload Gambar &\nSimpan Artikel Baru ke DB", b.ST_ACTION, 550, 340, 180, 55)
-    
-    # Edit Artikel
-    b.add_node("a_edit", "Mengubah Isi Form & Kirim Update", b.ST_ACTION, 110, 430, 180, 55)
-    b.add_node("s_edit", "Validasi & Update Artikel di DB", b.ST_ACTION, 550, 430, 180, 55)
-    
-    # Hapus Artikel
-    b.add_node("a_hapus", "Konfirmasi Hapus Artikel", b.ST_ACTION, 110, 520, 180, 55)
-    b.add_node("s_hapus", "Hapus Data Artikel dari DB", b.ST_ACTION, 550, 520, 180, 55)
-    
-    # Kembali
-    b.add_node("a_kembali", "Kembali ke Dashboard", b.ST_ACTION, 110, 610, 180, 55)
-    
-    b.add_node("s_refresh", "Me-refresh Daftar Artikel", b.ST_ACTION, 590, 700, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 235, 712, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 242, 719, 16, 16)
-    
-    b.link_nodes("start", "a1")
-    b.link_nodes("a1", "s1")
-    b.link_nodes("s1", "dec_aksi", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(690, 210), (250, 210)])
-    
-    b.link_nodes("dec_aksi", "a_tambah", label="Tambah", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(150, 267)])
-    b.link_nodes("dec_aksi", "a_edit", label="Edit", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(150, 267)])
-    b.link_nodes("dec_aksi", "a_hapus", label="Hapus", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(150, 267)])
-    b.link_nodes("dec_aksi", "a_kembali", label="Kembali", exit_pt=(0.5, 1), entry_pt=(0.5, 0))
-    
-    b.link_nodes("a_tambah", "s_tambah")
-    b.link_nodes("a_edit", "s_edit")
-    b.link_nodes("a_hapus", "s_hapus")
-    
-    b.link_nodes("s_tambah", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(640, 410), (690, 410)])
-    b.link_nodes("s_edit", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(640, 500), (690, 500)])
-    b.link_nodes("s_hapus", "s_refresh", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(640, 590), (690, 590)])
-    
-    b.link_nodes("s_refresh", "s1", exit_pt=(1, 0.5), entry_pt=(1, 0.5), points=[(910, 727), (910, 167)])
-    b.link_nodes("a_kembali", "final")
-    
+    # 5. Admin Kelola Artikel Blog (CRUD)
+    b = DrawioDiagramBuilder("Activity Kelola Artikel", "act-adm-kelola-art", 950, 1050)
+    build_cascading_crud(b, "artikel")
     b.save(os.path.join(dest_dir, "admin_kelola_artikel.drawio"))
+
+    # 5b. Admin Kelola Pengguna (CRUD)
+    b = DrawioDiagramBuilder("Activity Kelola Pengguna", "act-adm-kelola-pengguna", 950, 1050)
+    build_cascading_crud(b, "pengguna")
+    b.save(os.path.join(dest_dir, "admin_kelola_pengguna.drawio"))
 
 
     # ================== PENGGUNA DIAGRAMS (5 File) ==================
@@ -312,20 +266,20 @@ def generate_activities(dest_dir):
     b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 480, 40, 360, 660)
     b.add_node("start", "", b.ST_START, 225, 80, 30, 30)
     b.add_node("a1", "Membuka Form Registrasi\ndan Mengisi Data Diri Lengkap", b.ST_ACTION, 140, 140, 200, 55)
-    b.add_node("s1", "Memvalidasi Format Email, Sandi,\ndan Ketersediaan Email di DB", b.ST_ACTION, 560, 140, 200, 55)
+    b.add_node("s1", "Memvalidasi Format Username, Sandi,\ndan Ketersediaan Username di DB", b.ST_ACTION, 560, 140, 200, 55)
     b.add_node("dec", "Valid & Unik?", b.ST_RHOMBUS, 600, 230, 120, 75)
-    b.add_node("s2_err", "Menampilkan Error Validasi\n(Email sudah terdaftar/Data kurang)", b.ST_ACTION, 560, 340, 200, 55)
+    b.add_node("s2_err", "Menampilkan Error Validasi\n(Username sudah terdaftar/Data kurang)", b.ST_ACTION, 560, 340, 200, 55)
     b.add_node("s2_ok", "Menyimpan Data Pengguna Baru\ndan Melakukan Hash Password", b.ST_ACTION, 560, 430, 200, 55)
     b.add_node("s3", "Mengarahkan Pelanggan ke Halaman Login", b.ST_ACTION, 560, 520, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 532, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 539, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 532.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 539.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
     b.link_nodes("s1", "dec")
     b.link_nodes("dec", "s2_ok", label="Ya")
     b.link_nodes("dec", "s2_err", label="Tidak")
-    b.link_nodes("s2_err", "a1", points=[(780, 367), (780, 110), (240, 110)])
+    b.link_nodes("s2_err", "a1", points=[(780, 367.5), (780, 110), (240, 110)])
     b.link_nodes("s2_ok", "s3")
     b.link_nodes("s3", "final")
     b.save(os.path.join(dest_dir, "user_registrasi.drawio"))
@@ -335,20 +289,20 @@ def generate_activities(dest_dir):
     b.add_node("lane_left", "Pelanggan", b.ST_SWIMLANE, 60, 40, 360, 560)
     b.add_node("lane_right", "Sistem", b.ST_SWIMLANE, 480, 40, 360, 560)
     b.add_node("start", "", b.ST_START, 225, 80, 30, 30)
-    b.add_node("a1", "Mengisi Email & Password pada Form Login", b.ST_ACTION, 140, 140, 200, 55)
+    b.add_node("a1", "Mengisi Username & Password pada Form Login", b.ST_ACTION, 140, 140, 200, 55)
     b.add_node("s1", "Memvalidasi Kredensial Pelanggan", b.ST_ACTION, 560, 140, 200, 55)
     b.add_node("dec", "Kredensial\nValid?", b.ST_RHOMBUS, 600, 230, 120, 75)
     b.add_node("s2_err", "Menampilkan Error Kredensial Salah", b.ST_ACTION, 560, 340, 200, 55)
     b.add_node("s2_ok", "Mengatur Session Pengguna\ndan Redirect ke Halaman Beranda/Katalog", b.ST_ACTION, 560, 430, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 442, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 449, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 442.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 449.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
     b.link_nodes("s1", "dec")
     b.link_nodes("dec", "s2_ok", label="Ya")
     b.link_nodes("dec", "s2_err", label="Tidak")
-    b.link_nodes("s2_err", "a1", points=[(780, 367), (780, 110), (240, 110)])
+    b.link_nodes("s2_err", "a1", points=[(780, 367.5), (780, 110), (240, 110)])
     b.link_nodes("s2_ok", "final")
     b.save(os.path.join(dest_dir, "user_login.drawio"))
 
@@ -362,8 +316,8 @@ def generate_activities(dest_dir):
     b.add_node("dec", "Produk Ditemukan?", b.ST_RHOMBUS, 600, 230, 120, 75)
     b.add_node("s2_err", "Menampilkan Keterangan\n'Produk Tidak Ditemukan'", b.ST_ACTION, 560, 340, 200, 55)
     b.add_node("s2_ok", "Menampilkan Grid Produk Sesuai Hasil Filter", b.ST_ACTION, 560, 430, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 442, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 449, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 442.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 449.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
@@ -386,15 +340,15 @@ def generate_activities(dest_dir):
     b.add_node("a2_form", "Mengisi Form Checkout (Alamat,\nKurir Pengiriman, WhatsApp)", b.ST_ACTION, 140, 420, 200, 55)
     b.add_node("s3_order", "Menyimpan Data Pesanan, Total Harga,\ndan Membersihkan Item Keranjang", b.ST_ACTION, 560, 420, 200, 55)
     b.add_node("s4_invoice", "Menampilkan Halaman Pembayaran dengan\nNominal Unik Transfer Bank", b.ST_ACTION, 560, 520, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 532, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 539, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 532.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 539.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
     b.link_nodes("s1", "dec_login")
-    b.link_nodes("dec_login", "a2_form", label="Ya", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(250, 257)])
+    b.link_nodes("dec_login", "a2_form", label="Ya", exit_pt=(0, 0.5), entry_pt=(0.5, 0), points=[(240, 257.5)])
     b.link_nodes("dec_login", "s2_login", label="Tidak")
-    b.link_nodes("s2_login", "a2_form", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(660, 400), (250, 400)])
+    b.link_nodes("s2_login", "a2_form", exit_pt=(0.5, 1), entry_pt=(0.5, 0), points=[(660, 400), (240, 400)])
     b.link_nodes("a2_form", "s3_order")
     b.link_nodes("s3_order", "s4_invoice")
     b.link_nodes("s4_invoice", "final")
@@ -413,8 +367,8 @@ def generate_activities(dest_dir):
     b.add_node("s3_err", "Menampilkan Pesan Error Validasi File", b.ST_ACTION, 560, 410, 200, 55)
     b.add_node("s3_ok", "Menyimpan Gambar ke Server & Update\nStatus Pesanan ke 'Paid / Pending Review'", b.ST_ACTION, 560, 490, 200, 55)
     b.add_node("s4", "Menampilkan Notifikasi Sukses Upload", b.ST_ACTION, 560, 570, 200, 55)
-    b.add_node("final", "", b.ST_END_OUTER, 225, 582, 30, 30)
-    b.add_node("final_in", "", b.ST_END_INNER, 232, 589, 16, 16)
+    b.add_node("final", "", b.ST_END_OUTER, 225, 582.5, 30, 30)
+    b.add_node("final_in", "", b.ST_END_INNER, 232, 589.5, 16, 16)
     
     b.link_nodes("start", "a1")
     b.link_nodes("a1", "s1")
@@ -423,17 +377,17 @@ def generate_activities(dest_dir):
     b.link_nodes("s2", "dec")
     b.link_nodes("dec", "s3_ok", label="Ya")
     b.link_nodes("dec", "s3_err", label="Tidak")
-    b.link_nodes("s3_err", "a2", points=[(780, 437), (780, 210), (240, 210)])
+    b.link_nodes("s3_err", "a2", points=[(780, 437.5), (780, 210), (240, 210)])
     b.link_nodes("s3_ok", "s4")
     b.link_nodes("s4", "final")
     b.save(os.path.join(dest_dir, "user_upload_bukti.drawio"))
 
-    print("Successfully generated exactly 10 activity diagrams!")
+    print("Successfully generated exactly 11 activity diagrams!")
 
 
 if __name__ == "__main__":
     import sys
-    dest = "/var/home/indra12/skripsi/MekarJaya/diagram/activity"
+    dest = os.path.join(os.path.dirname(os.path.abspath(__file__)), "activity")
     if len(sys.argv) > 1:
         dest = sys.argv[1]
     generate_activities(dest)

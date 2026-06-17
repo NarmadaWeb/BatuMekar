@@ -13,29 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['cart'])) {
 require_login();
 $user_id = $_SESSION['user_id'];
 $name = $_POST['name'] ?? '';
-$email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $address = $_POST['address'] ?? '';
 $shipping_method = $_POST['shipping_method'] ?? 'Standard';
 $payment_method = $_POST['payment_method'] ?? 'Bank Transfer';
 
 // Calculate total
-$subtotal = 0;
-$ids = array_keys($_SESSION['cart']);
-$placeholders = implode(',', array_fill(0, count($ids), '?'));
-$stmt = $pdo->prepare("SELECT * FROM produk WHERE produk_id IN ($placeholders)");
-$stmt->execute($ids);
-$products = $stmt->fetchAll();
+list($cart_items, $subtotal, $item_count) = calculate_cart_totals($pdo);
 
 $items_to_save = [];
-foreach ($products as $p) {
-    $qty = $_SESSION['cart'][$p['produk_id']];
-    $total = $p['harga'] * $qty;
-    $subtotal += $total;
+foreach ($cart_items as $item) {
     $items_to_save[] = [
-        'product_id' => $p['produk_id'],
-        'quantity' => $qty,
-        'price' => $p['harga']
+        'product_id' => $item['produk_id'],
+        'ukuran_id' => $item['ukuran_id'],
+        'quantity' => $item['qty'],
+        'price' => $item['size_price'],
+        'name' => $item['nama'] . ($item['ukuran_label'] ? ' (' . $item['ukuran_label'] . ')' : ''),
     ];
 }
 
@@ -46,8 +39,6 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
 try {
     $pdo->beginTransaction();
 
-    // Set initial status based on payment method
-    // COD is immediately Processed (Diterima/Diproses), Midtrans starts as Pending
     $status = ($payment_method === 'COD') ? 'Processed' : 'Pending';
 
     // Insert Order
@@ -56,9 +47,13 @@ try {
     $order_id = $pdo->lastInsertId();
 
     // Insert Order Items
-    $stmt = $pdo->prepare("INSERT INTO detail_pesanan (pesanan_id, produk_id, jumlah, harga) VALUES (?, ?, ?, ?)");
+    try {
+        $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN ukuran_id INTEGER DEFAULT NULL");
+    } catch (PDOException $e) {}
+    $stmt = $pdo->prepare("INSERT INTO detail_pesanan (pesanan_id, produk_id, ukuran_id, jumlah, harga) VALUES (?, ?, ?, ?, ?)");
     foreach ($items_to_save as $item) {
-        $stmt->execute([$order_id, $item['product_id'], $item['quantity'], $item['price']]);
+        $ukuran_id = !empty($item['ukuran_id']) ? $item['ukuran_id'] : null;
+        $stmt->execute([$order_id, $item['product_id'], $ukuran_id, $item['quantity'], $item['price']]);
     }
 
     // Create notification for admin
@@ -77,18 +72,73 @@ try {
             'Pesanan Baru #MBM-' . $order_id,
             'Pesanan baru senilai ' . format_rupiah($grand_total) . ' dari ' . e($name) . ' (' . e($payment_method) . ')'
         ]);
-    } catch (Exception $e) {
-        // Notif table may not exist, silently ignore
-    }
+    } catch (Exception $e) {}
 
     $pdo->commit();
 
-    // Clear Cart
     $_SESSION['cart'] = [];
 
-    // Redirect to payments page with method indicator
-    $method_param = ($payment_method === 'COD') ? 'cod' : 'midtrans';
-    header("Location: pembayaran.php?order_id=" . $order_id . "&method=" . $method_param);
+    // MIDTRANS: Get Snap token for real payment
+    if ($payment_method === 'Midtrans') {
+        require_once 'config/midtrans.php';
+
+        $finish_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+            . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+            . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/')
+            . '/pembayaran.php?order_id=' . $order_id . '&method=midtrans';
+
+        $midtrans_items = [];
+        foreach ($items_to_save as $item) {
+            $midtrans_items[] = [
+                'id' => (string) $item['product_id'],
+                'price' => (int) $item['price'],
+                'quantity' => $item['quantity'],
+                'name' => substr($item['name'], 0, 50),
+            ];
+        }
+        if ($shipping_cost > 0) {
+            $midtrans_items[] = [
+                'id' => 'SHIPPING',
+                'price' => (int) $shipping_cost,
+                'quantity' => 1,
+                'name' => 'Ongkos Kirim',
+            ];
+        }
+        if ($admin_fee > 0) {
+            $midtrans_items[] = [
+                'id' => 'ADMIN',
+                'price' => (int) $admin_fee,
+                'quantity' => 1,
+                'name' => 'Biaya Admin',
+            ];
+        }
+
+        $customer = [
+            'first_name' => $name,
+            'phone' => $phone,
+            'billing_address' => [
+                'first_name' => $name,
+                'phone' => $phone,
+                'address' => $address,
+            ],
+        ];
+
+        $snap_result = midtrans_get_snap_token($order_id, $grand_total, $midtrans_items, $customer, $finish_url);
+
+        if ($snap_result && isset($snap_result['token'])) {
+            try {
+                $pdo->exec("ALTER TABLE pesanan ADD COLUMN snap_token TEXT DEFAULT NULL");
+            } catch (PDOException $e) {}
+            $stmt = $pdo->prepare("UPDATE pesanan SET snap_token = ? WHERE pesanan_id = ?");
+            $stmt->execute([$snap_result['token'], $order_id]);
+        }
+
+        header("Location: pembayaran.php?order_id=" . $order_id . "&method=midtrans");
+        exit;
+    }
+
+    // COD flow
+    header("Location: pembayaran.php?order_id=" . $order_id . "&method=cod");
     exit;
 
 } catch (Exception $e) {

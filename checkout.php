@@ -21,20 +21,7 @@ if (empty($_SESSION['cart'])) {
 $page_title = 'Checkout';
 require_once 'includes/header.php';
 
-$cart_items = [];
-$subtotal = 0;
-$ids = array_keys($_SESSION['cart']);
-$placeholders = implode(',', array_fill(0, count($ids), '?'));
-$stmt = $pdo->prepare("SELECT * FROM produk WHERE produk_id IN ($placeholders)");
-$stmt->execute($ids);
-$products = $stmt->fetchAll();
-
-foreach ($products as $p) {
-    $qty = $_SESSION['cart'][$p['produk_id']];
-    $total = $p['harga'] * $qty;
-    $subtotal += $total;
-    $cart_items[] = array_merge($p, ['qty' => $qty, 'total' => $total]);
-}
+list($cart_items, $subtotal, $item_count) = calculate_cart_totals($pdo);
 
 $shipping_cost = 25000;
 $admin_fee = 2000;
@@ -54,11 +41,7 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
                             <label for="name">Nama Lengkap</label>
                             <input id="name" name="name" class="form-control" value="<?php echo e($user['nama'] ?? ''); ?>" required>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Alamat Email</label>
-                            <input id="email" type="email" name="email" class="form-control" value="<?php echo e($user['email'] ?? ''); ?>" required>
-                        </div>
-                        <div class="form-group">
+                        <div style="grid-column: span 2;" class="form-group">
                             <label for="phone">Nomor Telepon / WA</label>
                             <input id="phone" type="tel" name="phone" class="form-control" value="<?php echo e($user['telepon'] ?? ''); ?>" required>
                         </div>
@@ -101,11 +84,16 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
                 <div class="card" style="position: sticky; top: 120px;">
                     <h2 style="margin-bottom: 24px;">Ringkasan Pesanan</h2>
                     <?php foreach ($cart_items as $item): ?>
-                    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center;">
                         <img src="<?php echo e($item['gambar']); ?>" alt="<?php echo e($item['nama']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                         <div style="flex-grow: 1;">
                             <div style="font-weight: 600; font-size: 14px;"><?php echo e($item['nama']); ?></div>
-                            <div style="font-size: 12px; color: var(--on-surface-variant);">Jumlah: <?php echo e($item['qty']); ?></div>
+                            <div style="font-size: 12px; color: var(--on-surface-variant);">
+                                <?php if ($item['ukuran_label']): ?>
+                                    <span style="color: #2563eb; font-weight: 600;"><?php echo e($item['ukuran_label']); ?></span> &middot;
+                                <?php endif; ?>
+                                <?php echo e($item['qty']); ?> x <?php echo e(format_rupiah($item['size_price'])); ?>
+                            </div>
                         </div>
                         <div style="font-weight: 600; font-size: 14px;"><?php echo e(format_rupiah($item['total'])); ?></div>
                     </div>

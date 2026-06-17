@@ -11,7 +11,7 @@
                 <mxCell id="elem_page_register_1" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="60" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_2" value="Madu MekarJaya" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_2" value="Madu BatuMekar" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="50" y="15" width="150" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_register_3" value="Beranda" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
@@ -44,8 +44,8 @@
                 <mxCell id="elem_page_register_12" value="Registrasi Akun Baru" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="50" y="80" width="400" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_13" value="BUAT AKUN MEKARJAYA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;" vertex="1" parent="1">
-                    <mxGeometry x="300" y="110" width="500" height="570" as="geometry"/>
+                <mxCell id="elem_page_register_13" value="BUAT AKUN BATUMEKAR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="110" width="500" height="470" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_register_14" value="Nama Lengkap Anda *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="330" y="130" width="200" height="20" as="geometry"/>
@@ -53,52 +53,46 @@
                 <mxCell id="elem_page_register_15" value="Indra Pratama" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="330" y="150" width="440" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_16" value="Alamat Email Aktif *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_16" value="Nomor WhatsApp *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="330" y="190" width="200" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_17" value="indra@mail.com" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_17" value="081234567890" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="330" y="210" width="440" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_18" value="Nomor WhatsApp *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_18" value="Pilih Username *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="330" y="250" width="200" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_19" value="081234567890" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_19" value="indra12" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="330" y="270" width="440" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_20" value="Pilih Username *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_20" value="Password Akun *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="330" y="310" width="200" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_21" value="indra12" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_21" value="••••••••••••" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="330" y="330" width="440" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_22" value="Password Akun *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_22" value="Ulangi Password *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="330" y="370" width="200" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_register_23" value="••••••••••••" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="330" y="390" width="440" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_24" value="Ulangi Password *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="430" width="200" height="20" as="geometry"/>
+                <mxCell id="elem_page_register_24" value="Daftar Sebagai:  [x] Pelanggan Umum    [ ] Reseller Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="435" width="440" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_25" value="••••••••••••" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="450" width="440" height="30" as="geometry"/>
+                <mxCell id="elem_page_register_25" value="Daftar Sekarang" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="475" width="440" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_26" value="Daftar Sebagai:  [x] Pelanggan Umum    [ ] Reseller Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="495" width="440" height="20" as="geometry"/>
+                <mxCell id="elem_page_register_26" value="Sudah punya akun? Login di sini" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="535" width="440" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_27" value="Daftar Sekarang" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="535" width="440" height="40" as="geometry"/>
-                </mxCell>
-                <mxCell id="elem_page_register_28" value="Sudah punya akun? Login di sini" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
-                    <mxGeometry x="330" y="595" width="440" height="20" as="geometry"/>
-                </mxCell>
-                <mxCell id="elem_page_register_29" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_27" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="740" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_30" value="© 2026 Kelompok Tani Desa BatuMekar - Madu MekarJaya. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_28" value="© 2026 Kelompok Tani Desa BatuMekar - Madu BatuMekar. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="50" y="750" width="600" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_register_31" value="Teknologi Informasi - Universitas Mataram" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_register_29" value="Teknologi Informasi - Universitas Mataram" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="850" y="750" width="200" height="30" as="geometry"/>
                 </mxCell>
             </root>

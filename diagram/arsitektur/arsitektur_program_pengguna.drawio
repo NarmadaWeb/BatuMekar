@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" version="21.6.8" modified="2026-06-16T12:00:00.000Z" agent="Mozilla/5.0" type="device">
+    <diagram id="arch-user" name="Arsitektur Program Pengguna">
+        <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="500" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="hal_utama" value="Halaman Utama" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="495" y="50" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="login" value="Login" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="495" y="150" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="beranda" value="Beranda" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="diagnosa" value="Diagnosa" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="205" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="hasil_diagnosa" value="Hasil Diagnosa" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="ensiklopedia" value="Ensiklopedia" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="495" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="panduan" value="Panduan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="640" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="riwayat" value="Riwayat Diagnosa" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="785" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="register" value="Register" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="930" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge_arch-user_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="hal_utama" target="login">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge_arch-user_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="beranda">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="115.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="diagnosa">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="260.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="hasil_diagnosa">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="405.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="ensiklopedia">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="550.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="panduan">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="695.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="riwayat">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="840.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-user_8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="register">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="550" y="220"/>
+                            <mxPoint x="985.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="1100" height="500" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -11,7 +11,7 @@
                 <mxCell id="elem_page_pembayaran_1" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="60" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_pembayaran_2" value="Madu MekarJaya" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_pembayaran_2" value="Madu BatuMekar" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="50" y="15" width="150" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_pembayaran_3" value="Beranda" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
@@ -65,13 +65,13 @@
                 <mxCell id="elem_page_pembayaran_19" value="Bank BCA" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="70" y="360" width="150" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_pembayaran_20" value="No. Rek: 890-123-4567&#10;a/n: Mekar Jaya Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_pembayaran_20" value="No. Rek: 890-123-4567&#10;a/n: Batu Mekar Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="70" y="385" width="200" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_pembayaran_21" value="Bank Mandiri" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="320" y="360" width="150" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_pembayaran_22" value="No. Rek: 123-000-987654&#10;a/n: Mekar Jaya Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_pembayaran_22" value="No. Rek: 123-000-987654&#10;a/n: Batu Mekar Madu" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="320" y="385" width="200" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_pembayaran_23" value="RINGKASAN DETAIL TAGIHAN" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;" vertex="1" parent="1">
@@ -113,7 +113,7 @@
                 <mxCell id="elem_page_pembayaran_35" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="740" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_pembayaran_36" value="© 2026 Kelompok Tani Desa BatuMekar - Madu MekarJaya. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_pembayaran_36" value="© 2026 Kelompok Tani Desa BatuMekar - Madu BatuMekar. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="50" y="750" width="600" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_pembayaran_37" value="Teknologi Informasi - Universitas Mataram" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">

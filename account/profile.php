@@ -22,16 +22,16 @@ $error_msg = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $address = trim($_POST['address'] ?? '');
 
-    if (empty($name) || empty($email)) {
-        $error_msg = 'Nama dan Email wajib diisi.';
+    if (empty($name) || empty($username)) {
+        $error_msg = 'Nama dan Username wajib diisi.';
     } else {
         try {
-            $update_stmt = $pdo->prepare("UPDATE pengguna SET nama = ?, email = ?, telepon = ?, alamat = ? WHERE pengguna_id = ?");
-            $update_stmt->execute([$name, $email, $phone, $address, $_SESSION['user_id']]);
+            $update_stmt = $pdo->prepare("UPDATE pengguna SET nama = ?, username = ?, telepon = ?, alamat = ? WHERE pengguna_id = ?");
+            $update_stmt->execute([$name, $username, $phone, $address, $_SESSION['user_id']]);
             
             // Handle profile photo upload
             if (isset($_FILES['profile_photo']) && $_FILES['profile_photo']['error'] === UPLOAD_ERR_OK) {
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $success_msg = 'Profil berhasil diperbarui!';
             }
         } catch (PDOException $e) {
-            $error_msg = 'Gagal memperbarui profil. Email mungkin sudah digunakan.';
+            $error_msg = 'Gagal memperbarui profil. Username mungkin sudah digunakan.';
         }
     }
 }
@@ -152,8 +152,8 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                     
                     <div class="form-group">
-                        <label for="email">Alamat Email</label>
-                        <input type="email" id="email" name="email" class="form-control" value="<?php echo e($user['email']); ?>" required>
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" value="<?php echo e($user['username']); ?>" required>
                     </div>
                     
                     <div class="form-group">

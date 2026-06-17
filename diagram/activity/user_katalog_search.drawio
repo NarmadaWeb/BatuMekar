@@ -30,10 +30,10 @@
                     <mxGeometry x="560" y="430" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="final" value="" style="ellipse;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="225" y="442" width="30" height="30" as="geometry"/>
+                    <mxGeometry x="225" y="442.5" width="30" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="final_in" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="232" y="449" width="16" height="16" as="geometry"/>
+                    <mxGeometry x="232" y="449.5" width="16" height="16" as="geometry"/>
                 </mxCell>
                 <mxCell id="edge_act-usr-katalog_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="start" target="a1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -60,6 +60,9 @@
                 </mxCell>
                 <mxCell id="edge_act-usr-katalog_7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s2_ok" target="final">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="900" height="700" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

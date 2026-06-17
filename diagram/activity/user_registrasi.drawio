@@ -17,13 +17,13 @@
                 <mxCell id="a1" value="Membuka Form Registrasi&#10;dan Mengisi Data Diri Lengkap" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
                     <mxGeometry x="140" y="140" width="200" height="55" as="geometry"/>
                 </mxCell>
-                <mxCell id="s1" value="Memvalidasi Format Email, Sandi,&#10;dan Ketersediaan Email di DB" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
+                <mxCell id="s1" value="Memvalidasi Format Username, Sandi,&#10;dan Ketersediaan Username di DB" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
                     <mxGeometry x="560" y="140" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="dec" value="Valid &amp; Unik?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
                     <mxGeometry x="600" y="230" width="120" height="75" as="geometry"/>
                 </mxCell>
-                <mxCell id="s2_err" value="Menampilkan Error Validasi&#10;(Email sudah terdaftar/Data kurang)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
+                <mxCell id="s2_err" value="Menampilkan Error Validasi&#10;(Username sudah terdaftar/Data kurang)" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
                     <mxGeometry x="560" y="340" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="s2_ok" value="Menyimpan Data Pengguna Baru&#10;dan Melakukan Hash Password" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;fillColor=#FFFFFF;strokeColor=#000000;fontSize=12;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;" vertex="1" parent="1">
@@ -33,10 +33,10 @@
                     <mxGeometry x="560" y="520" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="final" value="" style="ellipse;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="225" y="532" width="30" height="30" as="geometry"/>
+                    <mxGeometry x="225" y="532.5" width="30" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="final_in" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="232" y="539" width="16" height="16" as="geometry"/>
+                    <mxGeometry x="232" y="539.5" width="16" height="16" as="geometry"/>
                 </mxCell>
                 <mxCell id="edge_act-usr-reg_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="start" target="a1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -56,7 +56,7 @@
                 <mxCell id="edge_act-usr-reg_6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s2_err" target="a1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="780" y="367"/>
+                            <mxPoint x="780" y="367.5"/>
                             <mxPoint x="780" y="110"/>
                             <mxPoint x="240" y="110"/>
                         </Array>
@@ -67,6 +67,9 @@
                 </mxCell>
                 <mxCell id="edge_act-usr-reg_8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s3" target="final">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="900" height="750" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

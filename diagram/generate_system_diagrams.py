@@ -111,10 +111,10 @@ class DrawioDiagramBuilder:
 
 def generate_usecase(dest_dir):
     print("Generating Use Case Diagram...")
-    b = DrawioDiagramBuilder("Use Case Diagram", "uc-mekarjaya", width=1200, height=950)
+    b = DrawioDiagramBuilder("Use Case Diagram", "uc-batumekar", width=1200, height=950)
     
     # Background frame / System boundary
-    b.add_node("frame", "Sistem E-Commerce Madu Hutan MekarJaya", b.ST_FRAME_DASHED, 220, 30, 750, 880)
+    b.add_node("frame", "Sistem E-Commerce Madu Hutan BatuMekar", b.ST_FRAME_DASHED, 220, 30, 750, 880)
     
     # Actors
     b.add_node("act_admin", "Admin", b.ST_ACTOR, 80, 420, 40, 60)
@@ -122,27 +122,28 @@ def generate_usecase(dest_dir):
 
     # Use Cases
     # Auth and Shared
-    b.add_node("uc_login", "Login / Masuk", b.ST_USECASE, 510, 420, 140, 50)
-    b.add_node("uc_register", "Daftar Akun Baru", b.ST_USECASE, 740, 90, 150, 50)
-    b.add_node("uc_logout", "Logout / Keluar", b.ST_USECASE, 510, 500, 140, 50)
+    b.add_node("uc_login", "Login / Masuk", b.ST_USECASE, 510, 410, 150, 50)
+    b.add_node("uc_logout", "Logout / Keluar", b.ST_USECASE, 510, 490, 150, 50)
+    b.add_node("uc_register", "Daftar Akun Baru", b.ST_USECASE, 740, 90, 170, 50)
 
-    # Pelanggan
-    b.add_node("uc_katalog", "Lihat Katalog Produk", b.ST_USECASE, 740, 160, 150, 50)
-    b.add_node("uc_detail", "Lihat Detail Produk", b.ST_USECASE, 740, 230, 150, 50)
-    b.add_node("uc_keranjang", "Kelola Keranjang", b.ST_USECASE, 740, 300, 150, 50)
-    b.add_node("uc_checkout", "Melakukan Checkout", b.ST_USECASE, 740, 380, 150, 50)
-    b.add_node("uc_pembayaran", "Konfirmasi Pembayaran", b.ST_USECASE, 740, 460, 160, 50)
-    b.add_node("uc_riwayat", "Lihat Riwayat Pesanan", b.ST_USECASE, 740, 540, 150, 50)
-    b.add_node("uc_profil", "Kelola Profil Akun", b.ST_USECASE, 740, 620, 150, 50)
-    b.add_node("uc_kalender", "Lihat Kalender Panen", b.ST_USECASE, 740, 700, 150, 50)
-    b.add_node("uc_keberlanjutan", "Lihat Edukasi Lestari", b.ST_USECASE, 740, 780, 150, 50)
+    # Pelanggan Use Cases
+    b.add_node("uc_katalog", "Lihat Katalog Produk", b.ST_USECASE, 740, 160, 170, 50)
+    b.add_node("uc_detail", "Lihat Detail Produk", b.ST_USECASE, 740, 230, 170, 50)
+    b.add_node("uc_keranjang", "Kelola Keranjang Belanja", b.ST_USECASE, 740, 300, 170, 50)
+    b.add_node("uc_checkout", "Melakukan Checkout", b.ST_USECASE, 740, 380, 170, 50)
+    b.add_node("uc_pembayaran", "Konfirmasi Pembayaran", b.ST_USECASE, 740, 460, 170, 50)
+    b.add_node("uc_riwayat", "Lihat Riwayat Pesanan", b.ST_USECASE, 740, 540, 170, 50)
+    b.add_node("uc_profil", "Kelola Profil Akun", b.ST_USECASE, 740, 620, 170, 50)
+    b.add_node("uc_kalender", "Lihat Kalender Panen", b.ST_USECASE, 740, 700, 170, 50)
+    b.add_node("uc_keberlanjutan", "Lihat Edukasi Lestari", b.ST_USECASE, 740, 780, 170, 50)
 
-    # Admin
-    b.add_node("uc_dash_admin", "Lihat Dashboard Admin", b.ST_USECASE, 280, 100, 170, 50)
-    b.add_node("uc_kelola_prod", "Kelola Data Produk", b.ST_USECASE, 280, 180, 160, 50)
-    b.add_node("uc_kelola_kat", "Kelola Data Kategori", b.ST_USECASE, 280, 260, 160, 50)
-    b.add_node("uc_kelola_pes", "Kelola Data Pesanan", b.ST_USECASE, 280, 340, 160, 50)
-    b.add_node("uc_kelola_art", "Kelola Artikel Blog", b.ST_USECASE, 280, 420, 160, 50)
+    # Admin Use Cases
+    b.add_node("uc_dash_admin", "Lihat Dashboard Admin", b.ST_USECASE, 280, 120, 170, 50)
+    b.add_node("uc_kelola_prod", "Kelola Data Produk (CRUD)", b.ST_USECASE, 280, 200, 170, 50)
+    b.add_node("uc_kelola_kat", "Kelola Data Kategori (CRUD)", b.ST_USECASE, 280, 280, 170, 50)
+    b.add_node("uc_kelola_pes", "Kelola Data Pesanan (CRUD)", b.ST_USECASE, 280, 360, 170, 50)
+    b.add_node("uc_kelola_art", "Kelola Artikel Blog (CRUD)", b.ST_USECASE, 280, 440, 170, 50)
+    b.add_node("uc_kelola_pengguna", "Kelola Data Pengguna (CRUD)", b.ST_USECASE, 280, 520, 170, 50)
     
     # Links Actor -> Use Case
     # Admin links
@@ -153,6 +154,7 @@ def generate_usecase(dest_dir):
     b.link_nodes("act_admin", "uc_kelola_kat", style=b.EDGE_ASSOC)
     b.link_nodes("act_admin", "uc_kelola_pes", style=b.EDGE_ASSOC)
     b.link_nodes("act_admin", "uc_kelola_art", style=b.EDGE_ASSOC)
+    b.link_nodes("act_admin", "uc_kelola_pengguna", style=b.EDGE_ASSOC)
 
     # Pelanggan links
     b.link_nodes("act_user", "uc_register", style=b.EDGE_ASSOC)
@@ -179,25 +181,26 @@ def generate_usecase(dest_dir):
     b.link_nodes("uc_kelola_kat", "uc_login", label=incl_label, style=b.EDGE_INCLUDE)
     b.link_nodes("uc_kelola_pes", "uc_login", label=incl_label, style=b.EDGE_INCLUDE)
     b.link_nodes("uc_kelola_art", "uc_login", label=incl_label, style=b.EDGE_INCLUDE)
+    b.link_nodes("uc_kelola_pengguna", "uc_login", label=incl_label, style=b.EDGE_INCLUDE)
 
     b.save(os.path.join(dest_dir, "usecase", "usecase.drawio"))
 
 
 def generate_erd(dest_dir):
     print("Generating ERD Diagram...")
-    b = DrawioDiagramBuilder("ERD", "erd-mekarjaya", width=1200, height=950)
+    b = DrawioDiagramBuilder("ERD", "erd-batumekar", width=1200, height=950)
     
     # Table 1: pengguna
     t_pengguna = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">pengguna</div>'
-        '<b><u>pengguna_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        'nama : TEXT(35)<br/>'
-        'email : TEXT(50) UNIQUE<br/>'
-        'password : TEXT(64)<br/>'
-        'peran : TEXT CHECK(IN user, admin)<br/>'
-        'telepon : TEXT(15)<br/>'
+        '<b><u>pengguna_id</u></b> : INT AUTO_INCREMENT<br/>'
+        'nama : VARCHAR(35)<br/>'
+        'username : VARCHAR(30) UNIQUE<br/>'
+        'password : VARCHAR(64)<br/>'
+        'peran : VARCHAR(10)<br/>'
+        'telepon : VARCHAR(15)<br/>'
         'alamat : TEXT<br/>'
-        'foto_profil : TEXT(50)<br/>'
+        'foto_profil : VARCHAR(50)<br/>'
         'dibuat_pada : TIMESTAMP'
     )
     b.add_node("tbl_pengguna", t_pengguna, b.ST_TABLE, 80, 60, 240, 190)
@@ -205,8 +208,8 @@ def generate_erd(dest_dir):
     # Table 2: kategori
     t_kategori = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">kategori</div>'
-        '<b><u>kategori_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        'nama_kategori : TEXT<br/>'
+        '<b><u>kategori_id</u></b> : INT AUTO_INCREMENT<br/>'
+        'nama_kategori : VARCHAR(30)<br/>'
         'deskripsi : TEXT<br/>'
         'dibuat_pada : TIMESTAMP'
     )
@@ -215,16 +218,16 @@ def generate_erd(dest_dir):
     # Table 3: produk
     t_produk = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">produk</div>'
-        '<b><u>produk_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        'nama : TEXT(35)<br/>'
+        '<b><u>produk_id</u></b> : INT AUTO_INCREMENT<br/>'
+        'nama : VARCHAR(35)<br/>'
         'deskripsi : TEXT<br/>'
-        'harga : REAL<br/>'
-        'gambar : TEXT(50)<br/>'
-        'kategori : TEXT(30)<br/>'
-        'rating : REAL<br/>'
-        'jumlah_ulasan : INTEGER<br/>'
-        'stok : INTEGER<br/>'
-        'unggulan : INTEGER<br/>'
+        'harga : DECIMAL(10, 2)<br/>'
+        'gambar : VARCHAR(50)<br/>'
+        'kategori : VARCHAR(30)<br/>'
+        'rating : DECIMAL(3, 1)<br/>'
+        'jumlah_ulasan : INT<br/>'
+        'stok : INT<br/>'
+        'unggulan : TINYINT<br/>'
         'dibuat_pada : TIMESTAMP'
     )
     b.add_node("tbl_produk", t_produk, b.ST_TABLE, 850, 60, 250, 220)
@@ -232,14 +235,14 @@ def generate_erd(dest_dir):
     # Table 4: pesanan
     t_pesanan = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">pesanan</div>'
-        '<b><u>pesanan_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        '<i>pengguna_id</i> : INTEGER (FK)<br/>'
-        'total_harga : REAL<br/>'
-        'status : TEXT CHECK(IN Pending, Processed, Shipped, Completed)<br/>'
-        'metode_pengiriman : TEXT(20)<br/>'
-        'metode_pembayaran : TEXT(20)<br/>'
+        '<b><u>pesanan_id</u></b> : INT AUTO_INCREMENT<br/>'
+        '<i>pengguna_id</i> : INT (FK)<br/>'
+        'total_harga : DECIMAL(10, 2)<br/>'
+        'status : VARCHAR(15)<br/>'
+        'metode_pengiriman : VARCHAR(20)<br/>'
+        'metode_pembayaran : VARCHAR(20)<br/>'
         'alamat_pengiriman : TEXT<br/>'
-        'bukti_pembayaran : TEXT(50)<br/>'
+        'bukti_pembayaran : VARCHAR(50)<br/>'
         'dibuat_pada : TIMESTAMP'
     )
     b.add_node("tbl_pesanan", t_pesanan, b.ST_TABLE, 80, 360, 260, 200)
@@ -247,21 +250,21 @@ def generate_erd(dest_dir):
     # Table 5: detail_pesanan
     t_detail = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">detail_pesanan</div>'
-        '<b><u>detail_pesanan_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        '<i>pesanan_id</i> : INTEGER (FK)<br/>'
-        '<i>produk_id</i> : INTEGER (FK)<br/>'
-        'jumlah : INTEGER<br/>'
-        'harga : REAL'
+        '<b><u>detail_pesanan_id</u></b> : INT AUTO_INCREMENT<br/>'
+        '<i>pesanan_id</i> : INT (FK)<br/>'
+        '<i>produk_id</i> : INT (FK)<br/>'
+        'jumlah : INT<br/>'
+        'harga : DECIMAL(10, 2)'
     )
     b.add_node("tbl_detail", t_detail, b.ST_TABLE, 850, 360, 250, 130)
 
     # Table 6: pembayaran
     t_pembayaran = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">pembayaran</div>'
-        '<b><u>pembayaran_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        '<i>pesanan_id</i> : INTEGER (FK)<br/>'
-        '<i>pengguna_id</i> : INTEGER (FK)<br/>'
-        'transaksi_id : TEXT<br/>'
+        '<b><u>pembayaran_id</u></b> : INT AUTO_INCREMENT<br/>'
+        '<i>pesanan_id</i> : INT (FK)<br/>'
+        '<i>pengguna_id</i> : INT (FK)<br/>'
+        'transaksi_id : VARCHAR(50)<br/>'
         'tanggal_pembayaran : TIMESTAMP'
     )
     b.add_node("tbl_pembayaran", t_pembayaran, b.ST_TABLE, 480, 360, 220, 130)
@@ -269,11 +272,11 @@ def generate_erd(dest_dir):
     # Table 7: notifikasi
     t_notif = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">notifikasi</div>'
-        '<b><u>notifikasi_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        '<i>pesanan_id</i> : INTEGER (FK)<br/>'
-        'judul : TEXT<br/>'
+        '<b><u>notifikasi_id</u></b> : INT AUTO_INCREMENT<br/>'
+        '<i>pesanan_id</i> : INT (FK)<br/>'
+        'judul : VARCHAR(100)<br/>'
         'pesan : TEXT<br/>'
-        'dibaca : INTEGER<br/>'
+        'dibaca : TINYINT<br/>'
         'dibuat_pada : TIMESTAMP'
     )
     b.add_node("tbl_notif", t_notif, b.ST_TABLE, 80, 680, 240, 150)
@@ -281,13 +284,13 @@ def generate_erd(dest_dir):
     # Table 8: artikel
     t_artikel = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">artikel</div>'
-        '<b><u>artikel_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        'judul : TEXT(50)<br/>'
-        'kutipan : TEXT<br/>'
+        '<b><u>artikel_id</u></b> : INT AUTO_INCREMENT<br/>'
+        'judul : VARCHAR(100)<br/>'
+        'kutipan : VARCHAR(255)<br/>'
         'konten : TEXT<br/>'
-        'kategori : TEXT(30)<br/>'
-        'penulis : TEXT(35)<br/>'
-        'gambar : TEXT(50)<br/>'
+        'kategori : VARCHAR(30)<br/>'
+        'penulis : VARCHAR(35)<br/>'
+        'gambar : VARCHAR(50)<br/>'
         'dibuat_pada : TIMESTAMP'
     )
     b.add_node("tbl_artikel", t_artikel, b.ST_TABLE, 470, 680, 240, 170)
@@ -295,9 +298,9 @@ def generate_erd(dest_dir):
     # Table 9: faq
     t_faq = (
         '<div style="text-align: center; font-weight: bold; border-bottom: 1px solid #000000; padding-bottom: 4px; margin-bottom: 6px; font-size: 13px;">faq</div>'
-        '<b><u>faq_id</u></b> : INTEGER PRIMARY KEY<br/>'
-        'kategori : TEXT(30)<br/>'
-        'pertanyaan : TEXT(100)<br/>'
+        '<b><u>faq_id</u></b> : INT AUTO_INCREMENT<br/>'
+        'kategori : VARCHAR(30)<br/>'
+        'pertanyaan : VARCHAR(100)<br/>'
         'jawaban : TEXT'
     )
     b.add_node("tbl_faq", t_faq, b.ST_TABLE, 850, 680, 250, 110)
@@ -325,7 +328,7 @@ def generate_activity(dest_dir):
     
     # Swimlanes
     b.add_node("lane_left", "Pelanggan", b.ST_SWIMLANE, 60, 40, 380, 960)
-    b.add_node("lane_right", "Sistem & Admin MekarJaya", b.ST_SWIMLANE, 500, 40, 380, 960)
+    b.add_node("lane_right", "Sistem & Admin BatuMekar", b.ST_SWIMLANE, 500, 40, 380, 960)
 
     # Start node
     b.add_node("start", "", b.ST_START, 235, 80, 30, 30)
@@ -378,7 +381,7 @@ def generate_activity(dest_dir):
 
 def generate_architecture(dest_dir):
     print("Generating Program Architecture Diagram...")
-    b = DrawioDiagramBuilder("Arsitektur Program", "arch-mekarjaya", width=1100, height=800)
+    b = DrawioDiagramBuilder("Arsitektur Program", "arch-batumekar", width=1100, height=800)
     
     # 3 Layers Frames
     b.add_node("layer_client", "Client-Side (User Interface)", b.ST_FRAME_SOLID, 50, 80, 280, 600)
@@ -416,7 +419,7 @@ def generate_architecture(dest_dir):
 
 
 def generate_all():
-    dest = "/var/home/indra12/skripsi/MekarJaya/diagram"
+    dest = os.path.dirname(os.path.abspath(__file__))
     print(f"Generating all system diagrams inside {dest}...")
     generate_usecase(dest)
     generate_erd(dest)

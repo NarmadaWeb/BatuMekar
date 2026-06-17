@@ -11,7 +11,7 @@
                 <mxCell id="elem_page_login_1" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="60" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_login_2" value="Madu MekarJaya" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_login_2" value="Madu BatuMekar" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="50" y="15" width="150" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_login_3" value="Beranda" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
@@ -47,10 +47,10 @@
                 <mxCell id="elem_page_login_13" value="LOGIN PENGGUNA" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;spacingTop=6;spacingBottom=6;" vertex="1" parent="1">
                     <mxGeometry x="350" y="150" width="400" height="380" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_login_14" value="Username atau Email *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+                <mxCell id="elem_page_login_14" value="Username *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
                     <mxGeometry x="380" y="180" width="200" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_login_15" value="Masukkan username / email..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
+                <mxCell id="elem_page_login_15" value="Masukkan username..." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=left;verticalAlign=middle;spacingLeft=10;" vertex="1" parent="1">
                     <mxGeometry x="380" y="205" width="340" height="35" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_login_16" value="Password *" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;fontStyle=1;" vertex="1" parent="1">
@@ -68,7 +68,7 @@
                 <mxCell id="elem_page_login_20" value="Masuk Sekarang" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;fontStyle=1;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="380" y="375" width="340" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_login_21" value="Belum punya akun MekarJaya? Daftar di sini" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_login_21" value="Belum punya akun BatuMekar? Daftar di sini" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="380" y="440" width="340" height="20" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_login_22" value="Daftar Akun Baru" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
@@ -77,7 +77,7 @@
                 <mxCell id="elem_page_login_23" value="" style="line;strokeWidth=1;html=1;strokeColor=#000000;align=center;verticalAlign=middle;" vertex="1" parent="1">
                     <mxGeometry x="0" y="740" width="1100" height="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="elem_page_login_24" value="© 2026 Kelompok Tani Desa BatuMekar - Madu MekarJaya. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+                <mxCell id="elem_page_login_24" value="© 2026 Kelompok Tani Desa BatuMekar - Madu BatuMekar. All Rights Reserved." style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
                     <mxGeometry x="50" y="750" width="600" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="elem_page_login_25" value="Teknologi Informasi - Universitas Mataram" style="text;html=1;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">

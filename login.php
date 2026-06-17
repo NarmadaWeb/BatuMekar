@@ -13,14 +13,14 @@ if (isset($_SESSION['user_id'])) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if (empty($email) || empty($password)) {
-        $error = 'Email dan password harus diisi.';
+    if (empty($username) || empty($password)) {
+        $error = 'Username dan password harus diisi.';
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM pengguna WHERE email = ?");
-        $stmt->execute([$email]);
+        $stmt = $pdo->prepare("SELECT * FROM pengguna WHERE username = ?");
+        $stmt->execute([$username]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             exit;
         } else {
-            $error = 'Email atau password salah.';
+            $error = 'Username atau password salah.';
         }
     }
 }
@@ -61,8 +61,8 @@ require_once 'includes/header.php';
 
             <form action="login.php" method="POST" style="display: flex; flex-direction: column; gap: 8px;">
                 <div class="form-group">
-                    <label for="email">Alamat Email</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="nama@email.com" required>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" required>
                 </div>
                 
                 <div class="form-group">

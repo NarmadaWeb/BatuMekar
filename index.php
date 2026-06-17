@@ -43,7 +43,9 @@ $featured_products = get_featured_products($pdo);
         <div class="container">
             <h2 class="text-secondary" style="font-size: 40px; margin-bottom: 48px;">Koleksi Madu Terbaik</h2>
             <div class="grid grid-4">
-                <?php foreach ($featured_products as $product): ?>
+                <?php foreach ($featured_products as $product):
+                    $fp_sizes = get_product_sizes($pdo, $product['produk_id']);
+                ?>
                 <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <a href="produk.php?id=<?php echo e($product['produk_id']); ?>">
@@ -51,16 +53,19 @@ $featured_products = get_featured_products($pdo);
                         </a>
                         <div style="padding: 24px;">
                             <h3 class="text-secondary" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;"><?php echo e($product['nama']); ?></h3>
+                            <?php if (!empty($fp_sizes)): ?>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+                                <?php foreach ($fp_sizes as $s): ?>
+                                <span style="background: #eff6ff; color: #2563eb; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700;"><?php echo e($s['ukuran_ml']); ?>ml</span>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endif; ?>
                             <p class="text-on-surface-variant" style="font-size: 14px; margin-bottom: 16px;"><?php echo e(e($product['deskripsi'] ?? '')); ?></p>
                         </div>
                     </div>
                     <div style="padding: 0 24px 24px 24px;">
                         <p class="text-primary" style="font-size: 18px; font-weight: 700; margin-bottom: 16px;"><?php echo e(format_rupiah($product['harga'])); ?></p>
-                        <form action="keranjang.php" method="POST">
-                            <input type="hidden" name="action" value="add">
-                            <input type="hidden" name="product_id" value="<?php echo e($product['produk_id']); ?>">
-                            <button type="submit" class="btn btn-primary" style="width: 100%;">Tambah ke Keranjang</button>
-                        </form>
+                        <a href="produk.php?id=<?php echo e($product['produk_id']); ?>" class="btn btn-primary" style="width: 100%; text-decoration: none; display: inline-block; text-align: center; padding: 12px 0;">Pilih Ukuran</a>
                     </div>
                 </div>
                 <?php endforeach; ?>

@@ -39,10 +39,10 @@
                     <mxGeometry x="560" y="570" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="final" value="" style="ellipse;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="225" y="582" width="30" height="30" as="geometry"/>
+                    <mxGeometry x="225" y="582.5" width="30" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="final_in" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="232" y="589" width="16" height="16" as="geometry"/>
+                    <mxGeometry x="232" y="589.5" width="16" height="16" as="geometry"/>
                 </mxCell>
                 <mxCell id="edge_act-usr-upload_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="start" target="a1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -68,7 +68,7 @@
                 <mxCell id="edge_act-usr-upload_8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s3_err" target="a2">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="780" y="437"/>
+                            <mxPoint x="780" y="437.5"/>
                             <mxPoint x="780" y="210"/>
                             <mxPoint x="240" y="210"/>
                         </Array>
@@ -79,6 +79,9 @@
                 </mxCell>
                 <mxCell id="edge_act-usr-upload_10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s4" target="final">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="900" height="750" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

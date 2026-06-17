@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../config/db.php';
 require_admin();
 
-// Auto-create kategori table if not exists (for schema migration)
+// Auto-create tables if not exists
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS kategori (
         kategori_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -11,9 +11,22 @@ try {
         deskripsi TEXT DEFAULT NULL,
         dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
-} catch (PDOException $e) {
-    // Table may already exist, ignore
-}
+} catch (PDOException $e) {}
+
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS ukuran_produk (
+        ukuran_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        produk_id INTEGER NOT NULL,
+        ukuran_ml INTEGER NOT NULL,
+        harga REAL DEFAULT NULL,
+        stok INTEGER DEFAULT 0,
+        FOREIGN KEY (produk_id) REFERENCES produk(produk_id) ON DELETE CASCADE
+    )");
+} catch (PDOException $e) {}
+
+try {
+    $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN ukuran_id INTEGER DEFAULT NULL");
+} catch (PDOException $e) {}
 
 // Handle CRUD actions
 $msg = '';
@@ -31,73 +44,105 @@ if (isset($_GET['delete'])) {
     }
 }
 
-// ADD / EDIT product
+// DELETE size
+if (isset($_GET['delete_size'])) {
+    $size_id = (int)$_GET['delete_size'];
+    $prod_id = (int)$_GET['product_id'];
+    try {
+        $stmt = $pdo->prepare("DELETE FROM ukuran_produk WHERE ukuran_id = ? AND produk_id = ?");
+        $stmt->execute([$size_id, $prod_id]);
+        $msg = "Ukuran berhasil dihapus.";
+    } catch (PDOException $e) {
+        $error = "Gagal menghapus ukuran: " . $e->getMessage();
+    }
+}
+
+// ADD / EDIT product & ADD size
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
-    $nama = trim($_POST['nama'] ?? '');
-    $deskripsi = trim($_POST['deskripsi'] ?? '');
-    $harga = (float)($_POST['harga'] ?? 0);
-    $kategori = trim($_POST['kategori'] ?? '');
-    $stok = (int)($_POST['stok'] ?? 0);
-    $unggulan = isset($_POST['unggulan']) ? 1 : 0;
-    $gambar = '';
 
-    // Handle image upload
-    if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] !== UPLOAD_ERR_NO_FILE) {
-        if ($_FILES['gambar']['error'] !== UPLOAD_ERR_OK) {
-            $upload_errors = [
-                UPLOAD_ERR_INI_SIZE => 'Ukuran file melebihi batas server.',
-                UPLOAD_ERR_FORM_SIZE => 'Ukuran file terlalu besar.',
-                UPLOAD_ERR_PARTIAL => 'File hanya terupload sebagian.',
-                UPLOAD_ERR_NO_FILE => '',
-                UPLOAD_ERR_NO_TMP_DIR => 'Folder temporary tidak ditemukan.',
-                UPLOAD_ERR_CANT_WRITE => 'Gagal menulis file ke disk.',
-            ];
-            $error = 'Upload gagal: ' . ($upload_errors[$_FILES['gambar']['error']] ?? 'Error tidak diketahui.');
-        } else {
-            $file_tmp = $_FILES['gambar']['tmp_name'];
-            $file_name = $_FILES['gambar']['name'];
-            $file_size = $_FILES['gambar']['size'];
-            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
-            $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
-
-            if (!in_array($file_ext, $allowed_exts)) {
-                $error = 'Format file tidak didukung. Gunakan JPG, PNG, atau WebP.';
-            } elseif ($file_size > 2 * 1024 * 1024) {
-                $error = 'Ukuran file maksimal 2MB.';
-            } else {
-                $upload_dir = __DIR__ . '/../assets/uploads/produk/';
-                if (!file_exists($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
-                $new_file_name = 'produk_' . time() . '_' . rand(100, 999) . '.' . $file_ext;
-                if (move_uploaded_file($file_tmp, $upload_dir . $new_file_name)) {
-                    $gambar = 'assets/uploads/produk/' . $new_file_name;
-                } else {
-                    $error = 'Gagal menyimpan file. Coba lagi.';
-                }
-            }
+    if ($action === 'add_size') {
+        $produk_id = (int)$_POST['produk_id'];
+        $ukuran_ml = (int)$_POST['ukuran_ml'];
+        $harga_size = $_POST['harga_size'] !== '' ? (float)$_POST['harga_size'] : null;
+        $stok_size = (int)$_POST['stok_size'];
+        try {
+            $stmt = $pdo->prepare("INSERT INTO ukuran_produk (produk_id, ukuran_ml, harga, stok) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$produk_id, $ukuran_ml, $harga_size, $stok_size]);
+            $msg = "Ukuran {$ukuran_ml}ml berhasil ditambahkan.";
+        } catch (PDOException $e) {
+            $error = "Gagal menambah ukuran: " . $e->getMessage();
         }
     }
 
-    try {
-        if ($action === 'add') {
-            $stmt = $pdo->prepare("INSERT INTO produk (nama, deskripsi, harga, kategori, stok, unggulan, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $gambar]);
-            $msg = "Produk '{$nama}' berhasil ditambahkan.";
-        } elseif ($action === 'edit') {
-            $id = (int)$_POST['produk_id'];
-            if ($gambar) {
-                $stmt = $pdo->prepare("UPDATE produk SET nama=?, deskripsi=?, harga=?, kategori=?, stok=?, unggulan=?, gambar=? WHERE produk_id=?");
-                $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $gambar, $id]);
+    if ($action === 'add' || $action === 'edit') {
+        $nama = trim($_POST['nama'] ?? '');
+        $deskripsi = trim($_POST['deskripsi'] ?? '');
+        $harga = (float)($_POST['harga'] ?? 0);
+        $kategori = trim($_POST['kategori'] ?? '');
+        $stok = (int)($_POST['stok'] ?? 0);
+        $unggulan = isset($_POST['unggulan']) ? 1 : 0;
+        $gambar = '';
+
+        if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] !== UPLOAD_ERR_NO_FILE) {
+            if ($_FILES['gambar']['error'] !== UPLOAD_ERR_OK) {
+                $upload_errors = [
+                    UPLOAD_ERR_INI_SIZE => 'Ukuran file melebihi batas server.',
+                    UPLOAD_ERR_FORM_SIZE => 'Ukuran file terlalu besar.',
+                    UPLOAD_ERR_PARTIAL => 'File hanya terupload sebagian.',
+                    UPLOAD_ERR_NO_FILE => '',
+                    UPLOAD_ERR_NO_TMP_DIR => 'Folder temporary tidak ditemukan.',
+                    UPLOAD_ERR_CANT_WRITE => 'Gagal menulis file ke disk.',
+                ];
+                $error = 'Upload gagal: ' . ($upload_errors[$_FILES['gambar']['error']] ?? 'Error tidak diketahui.');
             } else {
-                $stmt = $pdo->prepare("UPDATE produk SET nama=?, deskripsi=?, harga=?, kategori=?, stok=?, unggulan=? WHERE produk_id=?");
-                $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $id]);
+                $file_tmp = $_FILES['gambar']['tmp_name'];
+                $file_name = $_FILES['gambar']['name'];
+                $file_size = $_FILES['gambar']['size'];
+                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $allowed_exts = ['jpg', 'jpeg', 'png', 'webp'];
+
+                if (!in_array($file_ext, $allowed_exts)) {
+                    $error = 'Format file tidak didukung. Gunakan JPG, PNG, atau WebP.';
+                } elseif ($file_size > 2 * 1024 * 1024) {
+                    $error = 'Ukuran file maksimal 2MB.';
+                } else {
+                    $upload_dir = __DIR__ . '/../assets/uploads/produk/';
+                    if (!file_exists($upload_dir)) {
+                        mkdir($upload_dir, 0755, true);
+                    }
+                    $new_file_name = 'produk_' . time() . '_' . rand(100, 999) . '.' . $file_ext;
+                    if (move_uploaded_file($file_tmp, $upload_dir . $new_file_name)) {
+                        $gambar = 'assets/uploads/produk/' . $new_file_name;
+                    } else {
+                        $error = 'Gagal menyimpan file. Coba lagi.';
+                    }
+                }
             }
-            $msg = "Produk '{$nama}' berhasil diperbarui.";
         }
-    } catch (PDOException $e) {
-        $error = "Gagal menyimpan produk: " . $e->getMessage();
+
+        try {
+            if ($action === 'add') {
+                $stmt = $pdo->prepare("INSERT INTO produk (nama, deskripsi, harga, kategori, stok, unggulan, gambar) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $gambar]);
+                $new_id = $pdo->lastInsertId();
+                $msg = "Produk '{$nama}' berhasil ditambahkan.";
+                echo "<script>window.location.href='produk.php?edit=" . $new_id . "&added=1';</script>";
+                exit;
+            } elseif ($action === 'edit') {
+                $id = (int)$_POST['produk_id'];
+                if ($gambar) {
+                    $stmt = $pdo->prepare("UPDATE produk SET nama=?, deskripsi=?, harga=?, kategori=?, stok=?, unggulan=?, gambar=? WHERE produk_id=?");
+                    $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $gambar, $id]);
+                } else {
+                    $stmt = $pdo->prepare("UPDATE produk SET nama=?, deskripsi=?, harga=?, kategori=?, stok=?, unggulan=? WHERE produk_id=?");
+                    $stmt->execute([$nama, $deskripsi, $harga, $kategori, $stok, $unggulan, $id]);
+                }
+                $msg = "Produk '{$nama}' berhasil diperbarui.";
+            }
+        } catch (PDOException $e) {
+            $error = "Gagal menyimpan produk: " . $e->getMessage();
+        }
     }
 }
 
@@ -111,8 +156,13 @@ $categories = $pdo->query("SELECT DISTINCT kategori FROM produk WHERE kategori I
 
 // If editing, load product
 $edit_product = null;
+$edit_sizes = [];
 if (isset($_GET['edit'])) {
-    $edit_product = get_product_by_id($pdo, (int)$_GET['edit']);
+    $edit_id = (int)$_GET['edit'];
+    $edit_product = get_product_by_id($pdo, $edit_id);
+    if ($edit_product) {
+        $edit_sizes = get_product_sizes($pdo, $edit_id);
+    }
 }
 
 $page_title = 'Manajemen Produk';
@@ -283,6 +333,67 @@ require_once __DIR__ . '/../includes/header.php';
                 </form>
             </div>
 
+            <!-- Size Management -->
+            <?php if ($edit_product): ?>
+            <div id="form-ukuran" class="card" style="padding: 32px; margin-bottom: 32px; border-radius: 16px;">
+                <h2 style="font-size: 20px; font-weight: 800; color: var(--secondary); margin-bottom: 24px;">
+                    <span class="material-symbols-outlined" style="font-size: 20px; vertical-align: middle; margin-right: 8px;">straighten</span>
+                    Ukuran (ml) — <?php echo e($edit_product['nama']); ?>
+                </h2>
+
+                <?php if (!empty($edit_sizes)): ?>
+                <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <?php foreach ($edit_sizes as $size): ?>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 16px;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 16px; color: var(--secondary);"><?php echo e($size['ukuran_ml']); ?> ml</div>
+                            <div style="font-size: 12px; color: #64748b;">
+                                <?php if ($size['harga']): ?>
+                                    Harga: <?php echo e(format_rupiah($size['harga'])); ?>
+                                <?php else: ?>
+                                    Harga: Mengikuti produk
+                                <?php endif; ?>
+                                &middot; Stok: <?php echo e($size['stok']); ?>
+                            </div>
+                        </div>
+                        <a href="produk.php?edit=<?php echo $edit_product['produk_id']; ?>&delete_size=<?php echo $size['ukuran_id']; ?>&product_id=<?php echo $edit_product['produk_id']; ?>" onclick="return confirm('Hapus ukuran <?php echo $size['ukuran_ml']; ?>ml?')" style="color: #ef4444; text-decoration: none; padding: 4px 8px; border-radius: 6px; background: #fef2f2; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">delete</span> Hapus
+                        </a>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <div style="padding: 16px; background: #fffbeb; border-radius: 8px; margin-bottom: 20px; font-size: 14px; color: #92400e;">
+                    <span class="material-symbols-outlined" style="font-size: 16px; vertical-align: middle;">info</span>
+                    Belum ada ukuran. Tambahkan ukuran (ml) untuk produk ini agar pembeli bisa memilih.
+                </div>
+                <?php endif; ?>
+
+                <form action="produk.php?edit=<?php echo $edit_product['produk_id']; ?>" method="POST" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+                    <input type="hidden" name="action" value="add_size">
+                    <input type="hidden" name="produk_id" value="<?php echo $edit_product['produk_id']; ?>">
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Ukuran (ml)</label>
+                        <input type="number" name="ukuran_ml" class="form-control" style="width: 120px;" placeholder="250" min="1" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Harga (kosongkan jika sama)</label>
+                        <input type="number" name="harga_size" class="form-control" style="width: 150px;" placeholder="Kosongkan" min="0">
+                    </div>
+                    <div>
+                        <label style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Stok</label>
+                        <input type="number" name="stok_size" class="form-control" style="width: 100px;" value="0" min="0" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Tambah Ukuran
+                    </button>
+                </form>
+                <div style="margin-top: 12px; font-size: 12px; color: #94a3b8;">
+                    Biarkan harga kosong jika harga ukuran sama dengan harga produk. Stok ukuran akan dikurangi saat pembelian.
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- Product Table -->
             <div class="card" style="padding: 0; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05); background: white; overflow: hidden;">
                 <div style="padding: 24px; border-bottom: 1px solid var(--outline-variant); display: flex; justify-content: space-between; align-items: center;">
@@ -296,6 +407,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Gambar</th>
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Nama Produk</th>
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Kategori</th>
+                                <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Ukuran (ml)</th>
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Harga</th>
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Stok</th>
                                 <th style="font-size: 12px; text-transform: uppercase; padding: 16px 20px; color: #475569; font-weight: 700;">Status</th>
@@ -303,8 +415,8 @@ require_once __DIR__ . '/../includes/header.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($products as $p): ?>
-                            <?php
+                            <?php foreach ($products as $p):
+                                $p_sizes = get_product_sizes($pdo, $p['produk_id']);
                                 $stok_status = 'tersedia';
                                 $stok_color = '#10b981';
                                 $stok_bg = '#ecfdf5';
@@ -332,6 +444,17 @@ require_once __DIR__ . '/../includes/header.php';
                                 <td style="padding: 12px 20px; color: #475569;">
                                     <span style="background: #f1f5f9; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #475569;"><?php echo e($p['kategori'] ?: '-'); ?></span>
                                 </td>
+                                <td style="padding: 12px 20px;">
+                                    <?php if (!empty($p_sizes)): ?>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                        <?php foreach ($p_sizes as $s): ?>
+                                            <span style="background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;"><?php echo e($s['ukuran_ml']); ?>ml</span>
+                                        <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span style="color: #94a3b8; font-size: 12px;">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td style="padding: 12px 20px; font-weight: 700; color: var(--primary);"><?php echo e(format_rupiah($p['harga'])); ?></td>
                                 <td style="padding: 12px 20px; font-weight: 700; color: #0f172a;"><?php echo e($p['stok']); ?></td>
                                 <td style="padding: 12px 20px;">
@@ -354,7 +477,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php endforeach; ?>
                             <?php if (empty($products)): ?>
                             <tr>
-                                <td colspan="7" style="padding: 48px; text-align: center; color: #94a3b8;">
+                                <td colspan="8" style="padding: 48px; text-align: center; color: #94a3b8;">
                                     <span class="material-symbols-outlined" style="font-size: 48px; display: block; margin-bottom: 12px;">inventory_2</span>
                                     Belum ada produk. Tambahkan produk pertama Anda!
                                 </td>

@@ -15,29 +15,29 @@ $error = '';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
     $phone = trim($_POST['phone'] ?? '');
     $address = trim($_POST['address'] ?? '');
 
-    if (empty($name) || empty($email) || empty($password)) {
-        $error = 'Nama, Email, dan Password wajib diisi.';
+    if (empty($name) || empty($username) || empty($password)) {
+        $error = 'Nama, Username, dan Password wajib diisi.';
     } elseif ($password !== $password_confirm) {
         $error = 'Konfirmasi password tidak cocok.';
     } elseif (strlen($password) < 6) {
         $error = 'Password minimal terdiri dari 6 karakter.';
     } else {
-        // Check if email already exists
-        $stmt = $pdo->prepare("SELECT pengguna_id FROM pengguna WHERE email = ?");
-        $stmt->execute([$email]);
+        // Check if username already exists
+        $stmt = $pdo->prepare("SELECT pengguna_id FROM pengguna WHERE username = ?");
+        $stmt->execute([$username]);
         if ($stmt->fetch()) {
-            $error = 'Email ini sudah terdaftar.';
+            $error = 'Username ini sudah terdaftar.';
         } else {
             // Insert user
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO pengguna (nama, email, password, peran, telepon, alamat) VALUES (?, ?, ?, 'user', ?, ?)");
-            $success_insert = $stmt->execute([$name, $email, $hashed_password, $phone, $address]);
+            $stmt = $pdo->prepare("INSERT INTO pengguna (nama, username, password, peran, telepon, alamat) VALUES (?, ?, ?, 'user', ?, ?)");
+            $success_insert = $stmt->execute([$name, $username, $hashed_password, $phone, $address]);
             
             if ($success_insert) {
                 $success = 'Pendaftaran berhasil! Silakan masuk.';
@@ -80,8 +80,8 @@ require_once 'includes/header.php';
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Alamat Email *</label>
-                    <input type="email" id="email" name="email" class="form-control" placeholder="nama@email.com" value="<?php echo e($_POST['email'] ?? ''); ?>" required>
+                    <label for="username">Username *</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Masukkan username" value="<?php echo e($_POST['username'] ?? ''); ?>" required>
                 </div>
 
                 <div class="grid grid-2" style="gap: 16px; margin-bottom: 8px;">

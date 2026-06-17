@@ -10,6 +10,7 @@ $order_id = (int)($_GET['order_id'] ?? 0);
 $method = trim($_GET['method'] ?? 'midtrans');
 $action = trim($_GET['action'] ?? '');
 $success = (int)($_GET['success'] ?? 0);
+$tx_status = trim($_GET['transaction_status'] ?? '');
 
 // Fetch the order
 $stmt = $pdo->prepare("SELECT * FROM pesanan WHERE pesanan_id = ? AND pengguna_id = ?");
@@ -21,25 +22,71 @@ if (!$order) {
     exit;
 }
 
-// Process mock Midtrans payment
-if ($method === 'midtrans' && $action === 'pay' && $order['status'] === 'Pending') {
-    try {
+// Handle Midtrans Snap finish callback (redirect back after payment)
+if ($method === 'midtrans' && $success !== 1 && $tx_status) {
+    $payment_ok = in_array($tx_status, ['capture', 'settlement']);
+    if ($payment_ok && $order['status'] === 'Pending') {
         $update = $pdo->prepare("UPDATE pesanan SET status = 'Processed' WHERE pesanan_id = ? AND pengguna_id = ?");
         $update->execute([$order_id, $_SESSION['user_id']]);
-        
-        // Also register mock payment record if pembayaran table exists
         try {
             $stmt_pay = $pdo->prepare("INSERT INTO pembayaran (pesanan_id, pengguna_id, transaksi_id) VALUES (?, ?, ?)");
             $mock_tx = 'TX-MIDTRANS-' . strtoupper(bin2hex(random_bytes(4)));
             $stmt_pay->execute([$order_id, $_SESSION['user_id'], $mock_tx]);
-        } catch (PDOException $ex) {
-            // Ignore if payments table is structured differently or not present
-        }
-
+        } catch (PDOException $ex) {}
         header("Location: pembayaran.php?order_id=" . $order_id . "&method=midtrans&success=1");
         exit;
-    } catch (PDOException $e) {
-        die("Gagal memproses pembayaran: " . $e->getMessage());
+    }
+}
+
+$snap_token = $order['snap_token'] ?? '';
+
+// Auto-regenerate Snap token if missing and order is still Pending
+if ($method === 'midtrans') {
+    require_once 'config/midtrans.php';
+}
+if ($method === 'midtrans' && !$snap_token && $order['status'] === 'Pending' && !$success) {
+
+    $stmt_items = $pdo->prepare("SELECT oi.*, p.nama as product_name FROM detail_pesanan oi JOIN produk p ON oi.produk_id = p.produk_id WHERE oi.pesanan_id = ?");
+    $stmt_items->execute([$order_id]);
+    $order_items = $stmt_items->fetchAll();
+
+    $midtrans_items = [];
+    foreach ($order_items as $item) {
+        $size_label = '';
+        if (!empty($item['ukuran_id'])) {
+            $size_info = get_size_by_id($pdo, $item['ukuran_id']);
+            if ($size_info) $size_label = ' (' . $size_info['ukuran_ml'] . ' ml)';
+        }
+        $midtrans_items[] = [
+            'id' => (string) $item['produk_id'],
+            'price' => (int) $item['harga'],
+            'quantity' => (int) $item['jumlah'],
+            'name' => substr($item['product_name'] . $size_label, 0, 50),
+        ];
+    }
+    $midtrans_items[] = ['id' => 'SHIPPING', 'price' => 25000, 'quantity' => 1, 'name' => 'Ongkos Kirim'];
+    $midtrans_items[] = ['id' => 'ADMIN', 'price' => 2000, 'quantity' => 1, 'name' => 'Biaya Admin'];
+
+    $stmt_user = $pdo->prepare("SELECT * FROM pengguna WHERE pengguna_id = ?");
+    $stmt_user->execute([$_SESSION['user_id']]);
+    $user_data = $stmt_user->fetch();
+
+    $finish_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
+        . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost')
+        . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/')
+        . '/pembayaran.php?order_id=' . $order_id . '&method=midtrans';
+
+    $customer = [
+        'first_name' => $user_data['nama'] ?? $order['alamat_pengiriman'],
+        'phone' => $user_data['telepon'] ?? '',
+    ];
+
+    $snap_result = midtrans_get_snap_token($order_id, $order['total_harga'], $midtrans_items, $customer, $finish_url);
+    if ($snap_result && isset($snap_result['token'])) {
+        $snap_token = $snap_result['token'];
+        try { $pdo->exec("ALTER TABLE pesanan ADD COLUMN snap_token TEXT DEFAULT NULL"); } catch (PDOException $e) {}
+        $stmt = $pdo->prepare("UPDATE pesanan SET snap_token = ? WHERE pesanan_id = ?");
+        $stmt->execute([$snap_token, $order_id]);
     }
 }
 
@@ -140,11 +187,10 @@ require_once 'includes/header.php';
             </div>
  
         <?php else: ?>
-            <!-- MIDTRANS SNAP MOCKUP UI -->
+            <!-- MIDTRANS SNAP REAL INTEGRATION -->
+            <?php if ($snap_token): ?>
             <div style="display: flex; flex-direction: column; gap: 24px; align-items: center; margin-top: 10px;">
-                
-                <!-- Notice and Total info -->
-                <div class="card" style="width: 100%; max-width: 650px; padding: 24px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+                <div class="card" style="width: 100%; max-width: 650px; padding: 24px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; background: white; border: 1px solid rgba(0,0,0,0.05);">
                     <div>
                         <span style="font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Merchant: BatuMekar Honey</span>
                         <h2 style="font-size: 20px; margin: 4px 0 0 0; color: #1e293b; font-weight: 800;">Pesanan #MBM-<?php echo $order_id; ?></h2>
@@ -155,203 +201,77 @@ require_once 'includes/header.php';
                     </div>
                 </div>
 
-                <!-- The Mock Midtrans Frame -->
-                <div class="card" style="width: 100%; max-width: 650px; padding: 0; border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; box-shadow: 0 20px 40px rgba(0,0,0,0.08); background: #ffffff; display: flex; flex-direction: column;">
-                    
-                    <!-- Midtrans Header -->
+                <div class="card" style="width: 100%; max-width: 650px; padding: 0; border-radius: 16px; overflow: hidden; border: 1px solid #cbd5e1; background: #ffffff;">
                     <div style="background: #1d2b4f; color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <!-- Midtrans Brand Logo Mock -->
                             <span style="background: #ffffff; color: #1d2b4f; font-weight: 900; font-size: 15px; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px;">midtrans</span>
-                            <span style="font-size: 13px; color: #94a3b8; font-weight: 500;">Secure Payment Portal</span>
+                            <span style="font-size: 13px; color: #94a3b8; font-weight: 500;">Secure Payment</span>
                         </div>
                         <div style="font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;">
-                            <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span> Sandbox Mode
+                            <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span> Sandbox
                         </div>
                     </div>
-
-                    <div style="display: grid; grid-template-columns: 240px 1fr; min-height: 320px;">
-                        <!-- Left Navigation: Categories -->
-                        <div style="background: #f8fafc; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-                            <div class="midtrans-tab active" onclick="switchMidtransTab(this, 'tab_qris')" style="padding: 16px 20px; font-size: 14px; font-weight: 700; color: #1e293b; border-bottom: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; gap: 10px; border-left: 4px solid #3b82f6; background: #eff6ff;">
-                                <span class="material-symbols-outlined" style="color: #3b82f6; font-size: 20px;">qr_code_2</span> GoPay / QRIS
-                            </div>
-                            <div class="midtrans-tab" onclick="switchMidtransTab(this, 'tab_va')" style="padding: 16px 20px; font-size: 14px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; gap: 10px; border-left: 4px solid transparent;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">account_balance</span> Virtual Account
-                            </div>
-                            <div class="midtrans-tab" onclick="switchMidtransTab(this, 'tab_card')" style="padding: 16px 20px; font-size: 14px; font-weight: 600; color: #64748b; border-bottom: 1px solid #e2e8f0; cursor: pointer; display: flex; align-items: center; gap: 10px; border-left: 4px solid transparent;">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">credit_card</span> Kartu Kredit
+                    <div style="padding: 32px; text-align: center;">
+                        <div id="snap-container" style="min-height: 400px;">
+                            <div id="snap-loading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #64748b;">
+                                <svg class="spinner" viewBox="0 0 50 50" style="width: 32px; height: 32px; animation: rotate 2s linear infinite; stroke: #3b82f6; margin-bottom: 16px;">
+                                    <circle cx="25" cy="25" r="20" fill="none" stroke-width="5" style="stroke-linecap: round; animation: dash 1.5s ease-in-out infinite;"></circle>
+                                </svg>
+                                <span style="font-weight: 600;">Memuat halaman pembayaran aman...</span>
                             </div>
                         </div>
-
-                        <!-- Right Panel: Details -->
-                        <div style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
-                            <!-- QRIS / GOPAY -->
-                            <div id="tab_qris" class="midtrans-panel-content" style="display: block;">
-                                <h4 style="font-size: 16px; margin: 0 0 10px 0; color: #0f172a; font-weight: 700;">Bayar dengan GoPay / QRIS</h4>
-                                <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">Scan QR code di bawah ini menggunakan GoPay, DANA, OVO, LinkAja atau mobile banking untuk melunasi.</p>
-                                
-                                <div style="display: flex; gap: 16px; align-items: center; background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #e2e8f0;">
-                                    <!-- Simple vector mock QR code -->
-                                    <div style="background: white; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; flex-shrink: 0;">
-                                        <svg width="100" height="100" viewBox="0 0 100 100">
-                                            <rect width="100" height="100" fill="white"/>
-                                            <rect x="0" y="0" width="25" height="25" fill="#1d2b4f"/>
-                                            <rect x="5" y="5" width="15" height="15" fill="white"/>
-                                            <rect x="75" y="0" width="25" height="25" fill="#1d2b4f"/>
-                                            <rect x="80" y="5" width="15" height="15" fill="white"/>
-                                            <rect x="0" y="75" width="25" height="25" fill="#1d2b4f"/>
-                                            <rect x="5" y="80" width="15" height="15" fill="white"/>
-                                            <rect x="40" y="40" width="20" height="20" fill="#1d2b4f"/>
-                                            <rect x="35" y="10" width="10" height="15" fill="#1d2b4f"/>
-                                            <rect x="10" y="35" width="15" height="10" fill="#1d2b4f"/>
-                                            <rect x="70" y="70" width="20" height="15" fill="#1d2b4f"/>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <span style="font-weight: 800; font-size: 14px; color: #1d2b4f; display: block; letter-spacing: 0.5px;">GOPAY / QRIS MOCK</span>
-                                        <span style="font-size: 12px; color: #64748b; display: block; margin-top: 4px; line-height: 1.4;">Jumlah yang akan dipotong sebesar total tagihan belanja Anda.</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- VIRTUAL ACCOUNT -->
-                            <div id="tab_va" class="midtrans-panel-content" style="display: none;">
-                                <h4 style="font-size: 16px; margin: 0 0 10px 0; color: #0f172a; font-weight: 700;">Bayar via Virtual Account</h4>
-                                <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">Pilih rekening Virtual Account bank tujuan:</p>
-                                
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; cursor: pointer;">
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <span style="font-size: 12px; font-weight: 800; background: #e2e8f0; color: #475569; padding: 4px 6px; border-radius: 4px;">BCA</span>
-                                            <span style="font-size: 13px; font-weight: 600; color: #334155;">BCA Virtual Account</span>
-                                        </div>
-                                        <input type="radio" name="va_bank" checked style="accent-color: #3b82f6;">
-                                    </div>
-
-                                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; background: white; cursor: pointer;">
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <span style="font-size: 12px; font-weight: 800; background: #e2e8f0; color: #475569; padding: 4px 6px; border-radius: 4px;">MANDIRI</span>
-                                            <span style="font-size: 13px; font-weight: 600; color: #334155;">Mandiri Bill Payment</span>
-                                        </div>
-                                        <input type="radio" name="va_bank" style="accent-color: #3b82f6;">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- CARD PAYMENT -->
-                            <div id="tab_card" class="midtrans-panel-content" style="display: none;">
-                                <h4 style="font-size: 16px; margin: 0 0 10px 0; color: #0f172a; font-weight: 700;">Bayar via Kartu Kredit / Debit</h4>
-                                <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">Masukkan detail kartu kredit Anda di bawah ini:</p>
-                                
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div class="form-group" style="margin: 0;">
-                                        <label style="font-size: 11px; color: #475569; font-weight: 600;">Nomor Kartu</label>
-                                        <input type="text" class="form-control" placeholder="4111 2222 3333 4444" style="height: 38px; font-size: 13px;">
-                                    </div>
-                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                                        <div class="form-group" style="margin: 0;">
-                                            <label style="font-size: 11px; color: #475569; font-weight: 600;">Masa Berlaku (MM/YY)</label>
-                                            <input type="text" class="form-control" placeholder="12/29" style="height: 38px; font-size: 13px;">
-                                        </div>
-                                        <div class="form-group" style="margin: 0;">
-                                            <label style="font-size: 11px; color: #475569; font-weight: 600;">CVV</label>
-                                            <input type="password" class="form-control" placeholder="•••" style="height: 38px; font-size: 13px;">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pay Button Action -->
-                            <div style="margin-top: 24px; border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; flex-direction: column; align-items: flex-end;">
-                                <div id="pay-spinner" style="display: none; align-items: center; gap: 10px; color: #3b82f6; font-size: 14px; font-weight: 600; margin-bottom: 12px;">
-                                    <svg class="spinner" viewBox="0 0 50 50" style="width: 20px; height: 20px; animation: rotate 2s linear infinite; stroke: #3b82f6;">
-                                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5" style="stroke-linecap: round; animation: dash 1.5s ease-in-out infinite;"></circle>
-                                    </svg>
-                                    Memproses pembayaran aman...
-                                </div>
-
-                                <a href="pembayaran.php?order_id=<?php echo $order_id; ?>&method=midtrans&action=pay" id="btn-pay-midtrans" onclick="showPaymentLoader(event, this);" class="btn btn-primary" style="background: #3b82f6; border-color: #3b82f6; width: 100%; text-align: center; justify-content: center; padding: 14px; font-size: 15px; font-weight: 700; border-radius: 8px;">
-                                    Bayar Sekarang
-                                </a>
-                            </div>
-
-                        </div>
+                        <p style="margin-top: 16px; font-size: 13px; color: #94a3b8;">
+                            <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle;">lock</span>
+                            Pembayaran diproses secara aman oleh Midtrans
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Page Scripts and Custom Styles -->
+            <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="<?php echo MIDTRANS_CLIENT_KEY; ?>"></script>
             <style>
-                .midtrans-tab {
-                    transition: all 0.2s ease;
-                }
-                .midtrans-tab:hover {
-                    background: #f1f5f9;
-                }
-                .spinner {
-                    animation: rotate 2s linear infinite;
-                }
-                @keyframes rotate {
-                    100% {
-                        transform: rotate(360deg);
-                    }
-                }
+                @keyframes rotate { 100% { transform: rotate(360deg); } }
                 @keyframes dash {
-                    0% {
-                        stroke-dasharray: 1, 150;
-                        stroke-dashoffset: 0;
-                    }
-                    50% {
-                        stroke-dasharray: 90, 150;
-                        stroke-dashoffset: -35;
-                    }
-                    100% {
-                        stroke-dasharray: 90, 150;
-                        stroke-dashoffset: -124;
-                    }
+                    0% { stroke-dasharray: 1, 150; stroke-dashoffset: 0; }
+                    50% { stroke-dasharray: 90, 150; stroke-dashoffset: -35; }
+                    100% { stroke-dasharray: 90, 150; stroke-dashoffset: -124; }
                 }
             </style>
-            
             <script>
-                function switchMidtransTab(element, panelId) {
-                    // Reset all tabs
-                    document.querySelectorAll('.midtrans-tab').forEach(function(tab) {
-                        tab.style.color = '#64748b';
-                        tab.style.fontWeight = '600';
-                        tab.style.borderLeftColor = 'transparent';
-                        tab.style.background = 'transparent';
-                        tab.classList.remove('active');
+            document.addEventListener('DOMContentLoaded', function() {
+                var snapToken = '<?php echo $snap_token; ?>';
+                if (snapToken) {
+                    window.snap.embed(snapToken, {
+                        embedId: 'snap-container',
+                        onSuccess: function(result) {
+                            window.location.href = 'pembayaran.php?order_id=<?php echo $order_id; ?>&method=midtrans&transaction_status=settlement';
+                        },
+                        onPending: function(result) {
+                            window.location.href = 'pembayaran.php?order_id=<?php echo $order_id; ?>&method=midtrans&transaction_status=pending';
+                        },
+                        onError: function(result) {
+                            document.getElementById('snap-loading').innerHTML = '<span style="color:#ef4444;font-weight:600;">Gagal memuat pembayaran. Silakan coba lagi.</span>';
+                            document.getElementById('snap-loading').style.display = 'flex';
+                        },
+                        onClose: function() {
+                            document.getElementById('snap-loading').style.display = 'flex';
+                            document.getElementById('snap-loading').innerHTML = '<span style="color:#64748b;">Pembayaran ditutup. <a href="account/orders.php" style="color:#3b82f6;">Kembali ke pesanan</a></span>';
+                        }
                     });
-                    
-                    // Set active tab
-                    element.style.color = '#1e293b';
-                    element.style.fontWeight = '700';
-                    element.style.borderLeftColor = '#3b82f6';
-                    element.style.background = '#eff6ff';
-                    element.classList.add('active');
-
-                    // Hide all panels
-                    document.querySelectorAll('.midtrans-panel-content').forEach(function(panel) {
-                        panel.style.display = 'none';
-                    });
-
-                    // Show selected panel
-                    document.getElementById(panelId).style.display = 'block';
+                    document.getElementById('snap-loading').style.display = 'none';
                 }
-
-                function showPaymentLoader(event, element) {
-                    event.preventDefault();
-                    document.getElementById('pay-spinner').style.display = 'flex';
-                    element.style.opacity = '0.7';
-                    element.style.pointerEvents = 'none';
-                    element.textContent = "Menghubungkan...";
-                    
-                    setTimeout(function() {
-                        window.location.href = element.getAttribute('href');
-                    }, 2000);
-                }
+            });
             </script>
+            <?php else: ?>
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+                    <span class="material-symbols-outlined" style="font-size: 40px; color: #ef4444;">error_outline</span>
+                </div>
+                <h2 style="font-size: 24px; color: #1e293b; margin-bottom: 8px;">Token Pembayaran Tidak Tersedia</h2>
+                <p style="color: #64748b; margin-bottom: 24px;">Gagal mendapatkan token pembayaran dari Midtrans. Silakan coba lagi.</p>
+                <a href="account/orders.php" class="btn btn-primary">Kembali ke Pesanan</a>
+            </div>
+            <?php endif; ?>
         <?php endif; ?>
 
     </div>

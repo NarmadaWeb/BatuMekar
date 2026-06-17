@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" version="21.6.8" modified="2026-06-16T12:00:00.000Z" agent="Mozilla/5.0" type="device">
+    <diagram id="arch-admin" name="Arsitektur Program Admin">
+        <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="login" value="Login" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="545" y="50" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dash_admin" value="Dashboard Admin" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="545" y="150" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dash" value="Dashboard" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dt_penyakit" value="Data Penyakit" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="190" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dt_gejala" value="Data Gejala" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dt_aturan" value="Data Aturan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="470" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="dt_users" value="Data Users" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="610" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="lap_diagnosa" value="Laporan Diagnosa" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="pengaturan" value="Pengaturan" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="890" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="logout" value="Log out" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="1030" y="270" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="profil" value="Profil" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="890" y="390" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="ubah_pass" value="Ubah Password" style="rounded=1;whiteSpace=wrap;html=1;arcSize=10;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.5;fontColor=#000000;fontSize=12;align=center;verticalAlign=middle;fontFamily=Helvetica;" vertex="1" parent="1">
+                    <mxGeometry x="890" y="510" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge_arch-admin_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="login" target="dash_admin">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge_arch-admin_2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="dash">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="105.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="dt_penyakit">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="245.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="dt_gejala">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="385.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="dt_aturan">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="525.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="dt_users">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="665.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="lap_diagnosa">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="805.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="pengaturan">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="945.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="dash_admin" target="logout">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="600" y="220"/>
+                            <mxPoint x="1085.0" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="edge_arch-admin_10" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="pengaturan" target="profil">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="edge_arch-admin_11" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;endArrow=classic;endSize=8;" edge="1" parent="1" source="profil" target="ubah_pass">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="1200" height="700" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

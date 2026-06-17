@@ -36,10 +36,10 @@
                     <mxGeometry x="560" y="520" width="200" height="55" as="geometry"/>
                 </mxCell>
                 <mxCell id="final" value="" style="ellipse;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="225" y="532" width="30" height="30" as="geometry"/>
+                    <mxGeometry x="225" y="532.5" width="30" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="final_in" value="" style="ellipse;html=1;fillColor=#000000;strokeColor=none;aspect=fixed;" vertex="1" parent="1">
-                    <mxGeometry x="232" y="539" width="16" height="16" as="geometry"/>
+                    <mxGeometry x="232" y="539.5" width="16" height="16" as="geometry"/>
                 </mxCell>
                 <mxCell id="edge_act-usr-checkout_1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="start" target="a1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -53,7 +53,7 @@
                 <mxCell id="edge_act-usr-checkout_4" value="Ya" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="dec_login" target="a2_form">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="250" y="257"/>
+                            <mxPoint x="240" y="257.5"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
@@ -64,7 +64,7 @@
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="660" y="400"/>
-                            <mxPoint x="250" y="400"/>
+                            <mxPoint x="240" y="400"/>
                         </Array>
                     </mxGeometry>
                 </mxCell>
@@ -76,6 +76,9 @@
                 </mxCell>
                 <mxCell id="edge_act-usr-checkout_9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=12;labelBackgroundColor=#FFFFFF;fontColor=#000000;" edge="1" parent="1" source="s4_invoice" target="final">
                     <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="frame" value="" style="fillColor=none;strokeColor=none;connectable=0;allowArrows=0;" vertex="1" parent="1">
+                    <mxGeometry x="0" y="0" width="900" height="750" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

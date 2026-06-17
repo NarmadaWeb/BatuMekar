@@ -23,12 +23,12 @@ try {
     $user_password = password_hash('user123', PASSWORD_BCRYPT, ['cost' => 12]);
 
     // Seed Pengguna
-    $stmt = $pdo->prepare("INSERT INTO pengguna (nama, email, password, peran, telepon, alamat) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO pengguna (nama, username, password, peran, telepon, alamat) VALUES (?, ?, ?, ?, ?, ?)");
     
     // Admin
     $stmt->execute([
         'Admin BatuMekar',
-        'admin@batumekar.com',
+        'admin',
         $admin_password,
         'admin',
         '+6281234567890',
@@ -38,7 +38,7 @@ try {
     // Customer
     $stmt->execute([
         'I Gede Sukarsa',
-        'gede@example.com',
+        'gede',
         $user_password,
         'user',
         '+6287865432109',

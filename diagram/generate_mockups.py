@@ -85,12 +85,12 @@ class DrawioMockupBuilder:
 
         if is_admin:
             # Admin Header
-            self.add_text("Panel Admin MekarJaya", 50, 15, 250, 30, bold=True)
+            self.add_text("Panel Admin BatuMekar", 50, 15, 250, 30, bold=True)
             self.add_button("Lihat Toko", 850, 15, 100, 30)
             self.add_button("Keluar", 960, 15, 90, 30, bold=True)
         else:
             # Customer Header
-            self.add_text("Madu MekarJaya", 50, 15, 150, 30, bold=True)
+            self.add_text("Madu BatuMekar", 50, 15, 150, 30, bold=True)
             
             # Navigation Tabs
             tabs = [
@@ -118,7 +118,7 @@ class DrawioMockupBuilder:
         self.add_line(0, self.height - 60, self.width, 1)
         
         # Footer Text
-        copyright_txt = "© 2026 Kelompok Tani Desa BatuMekar - Madu MekarJaya. All Rights Reserved."
+        copyright_txt = "© 2026 Kelompok Tani Desa BatuMekar - Madu BatuMekar. All Rights Reserved."
         academic_txt = "Teknologi Informasi - Universitas Mataram"
         
         self.add_text(copyright_txt, 50, self.height - 50, 600, 30)
@@ -223,7 +223,7 @@ def generate_all_mockups(dest_dir):
     b = DrawioMockupBuilder("2_katalog", "page_katalog")
     b.add_header("Katalog")
     # Title
-    b.add_text("Katalog Madu MekarJaya", 50, 80, 400, 30, bold=True)
+    b.add_text("Katalog Madu BatuMekar", 50, 80, 400, 30, bold=True)
     # Filter Sidebar
     b.add_card("FILTER PRODUK\n\n[ Cari Produk... ]\n\nKategori:\n[ ] Semua\n[x] Madu Hutan\n[ ] Madu Budidaya\n[ ] Paket Reseller\n\nHarga:\nMin: Rp 0\nMax: Rp 200.000", 50, 130, 200, 400)
     # Products Grid
@@ -383,10 +383,10 @@ def generate_all_mockups(dest_dir):
     b.add_text("Batas waktu pembayaran: 24 Jam dari sekarang.", 70, 315, 400, 20)
     
     b.add_text("Bank BCA", 70, 360, 150, 20, bold=True)
-    b.add_text("No. Rek: 890-123-4567\na/n: Mekar Jaya Madu", 70, 385, 200, 40)
+    b.add_text("No. Rek: 890-123-4567\na/n: Batu Mekar Madu", 70, 385, 200, 40)
     
     b.add_text("Bank Mandiri", 320, 360, 150, 20, bold=True)
-    b.add_text("No. Rek: 123-000-987654\na/n: Mekar Jaya Madu", 320, 385, 200, 40)
+    b.add_text("No. Rek: 123-000-987654\na/n: Batu Mekar Madu", 320, 385, 200, 40)
     
     # Summary Info
     b.add_card("RINGKASAN DETAIL TAGIHAN", 680, 220, 370, 250)
@@ -419,7 +419,7 @@ def generate_all_mockups(dest_dir):
     b.add_input("Indra Pratama", 270, 250, 560, 35)
     
     b.add_text("Transfer Ke Bank *", 270, 300, 250, 20, bold=True)
-    b.add_input("Bank BCA (890-123-4567 a/n Mekar Jaya Madu)", 270, 325, 560, 35)
+    b.add_input("Bank BCA (890-123-4567 a/n Batu Mekar Madu)", 270, 325, 560, 35)
     
     b.add_text("Pilih Foto Bukti Transfer * (Maks. 2MB, format .jpg/.png)", 270, 375, 450, 20, bold=True)
     b.add_button("Pilih File... (bukti_tf_indra.png)", 270, 400, 560, 35)
@@ -433,18 +433,18 @@ def generate_all_mockups(dest_dir):
     # 8. Tentang Desa
     b = DrawioMockupBuilder("8_tentang_desa", "page_tentang_desa")
     b.add_header("Tentang Desa")
-    b.add_text("Profil Desa BatuMekar & Kelompok Madu MekarJaya", 50, 80, 600, 30, bold=True)
+    b.add_text("Profil Desa BatuMekar & Kelompok Madu BatuMekar", 50, 80, 600, 30, bold=True)
     
-    b.add_text("Desa BatuMekar berlokasi di wilayah perbukitan asri Kecamatan Lingsar, Lombok Barat. Dikelilingi hutan alam sekunder yang kaya akan keanekaragaman flora, khususnya pohon kaliandra, kelengkeng, dan aneka tanaman liar lainnya.\n\nKelompok Tani MekarJaya menginisiasi panen madu hutan lestari guna memberdayakan ekonomi warga desa tanpa merusak habitat lebah hutan (Apis Dorsata). Kami menggunakan sistem panen tradisional ramah lingkungan yang menjaga populasi lebah tetap berkelanjutan.", 50, 130, 550, 260)
+    b.add_text("Desa BatuMekar berlokasi di wilayah perbukitan asri Kecamatan Lingsar, Lombok Barat. Dikelilingi hutan alam sekunder yang kaya akan keanekaragaman flora, khususnya pohon kaliandra, kelengkeng, dan aneka tanaman liar lainnya.\n\nKelompok Tani BatuMekar menginisiasi panen madu hutan lestari guna memberdayakan ekonomi warga desa tanpa merusak habitat lebah hutan (Apis Dorsata). Kami menggunakan sistem panen tradisional ramah lingkungan yang menjaga populasi lebah tetap berkelanjutan.", 50, 130, 550, 260)
     
     b.add_box("[ Gambar Lanskap Desa BatuMekar & Sarang Lebah ]", 630, 130, 420, 240)
     
     # Vision & Mission
-    b.add_card("VISI & MISI MEKARJAYA", 50, 410, 1000, 150)
+    b.add_card("VISI & MISI BATUMEKAR", 50, 410, 1000, 150)
     b.add_text("Visi kami adalah menjadi penyedia madu hutan asli berkualitas premium dan menjadi model pelopor pelestarian hutan lebah lokal NTB.\n\nMisi:\n1. Menyediakan madu murni berkualitas tinggi tanpa proses kimiawi.\n2. Memberdayakan kelompok tani lokal Desa BatuMekar secara berkelanjutan.\n3. Mengedukasi masyarakat mengenai pentingnya melestarikan hutan lindung.", 70, 430, 960, 110)
     
     # Harvesters Profile
-    b.add_text("Anggota Inti Kelompok Tani MekarJaya", 50, 580, 400, 20, bold=True)
+    b.add_text("Anggota Inti Kelompok Tani BatuMekar", 50, 580, 400, 20, bold=True)
     b.add_card("[Foto Wayan]\nPak Wayan\nKepala Pemanen Hutan", 50, 610, 310, 100)
     b.add_card("[Foto Ketut]\nIbu Ketut\nQC & Pengemasan", 395, 610, 310, 100)
     b.add_card("[Foto Nyoman]\nPak Nyoman\nLogistik & Penjualan", 740, 610, 310, 100)
@@ -455,16 +455,16 @@ def generate_all_mockups(dest_dir):
     # 9. Blog
     b = DrawioMockupBuilder("9_blog", "page_blog")
     b.add_header("Blog")
-    b.add_text("Blog & Kabar Panen MekarJaya", 50, 80, 400, 30, bold=True)
+    b.add_text("Blog & Kabar Panen BatuMekar", 50, 80, 400, 30, bold=True)
     
     # Blog list
-    b.add_card("Panen Raya Madu Kaliandra Musim Ini Berlimpah - 10 Juni 2026\n\nMusim kemarau tahun ini membawa berkah tersendiri bagi kelompok tani MekarJaya. Bunga kaliandra bermekaran sempurna di bukit BatuMekar, menghasilkan madu dengan aroma harum khas...", 50, 120, 700, 130)
+    b.add_card("Panen Raya Madu Kaliandra Musim Ini Berlimpah - 10 Juni 2026\n\nMusim kemarau tahun ini membawa berkah tersendiri bagi kelompok tani BatuMekar. Bunga kaliandra bermekaran sempurna di bukit BatuMekar, menghasilkan madu dengan aroma harum khas...", 50, 120, 700, 130)
     b.add_button("Baca Selengkapnya", 580, 210, 150, 30)
 
     b.add_card("5 Manfaat Utama Madu Hutan Liar Bagi Imunitas Tubuh - 28 Mei 2026\n\nMadu hutan liar mengandung antioksidan fenolik yang jauh lebih tinggi dibanding madu ternakan biasa. Kandungan ini efektif melawan radikal bebas dan memperkuat sistem imun tubuh...", 50, 270, 700, 130)
     b.add_button("Baca Selengkapnya", 580, 360, 150, 30)
 
-    b.add_card("Bagaimana Membedakan Madu Asli dan Madu Campuran? - 15 Mei 2026\n\nBanyak beredar madu sirup atau campuran gula di pasaran. Kelompok Tani MekarJaya membagikan tips sederhana menguji keaslian madu menggunakan air hangat dan uji bakar kertas...", 50, 420, 700, 130)
+    b.add_card("Bagaimana Membedakan Madu Asli dan Madu Campuran? - 15 Mei 2026\n\nBanyak beredar madu sirup atau campuran gula di pasaran. Kelompok Tani BatuMekar membagikan tips sederhana menguji keaslian madu menggunakan air hangat dan uji bakar kertas...", 50, 420, 700, 130)
     b.add_button("Baca Selengkapnya", 580, 510, 150, 30)
     
     # Sidebar
@@ -539,7 +539,7 @@ def generate_all_mockups(dest_dir):
     # 12. Kontak
     b = DrawioMockupBuilder("12_kontak", "page_kontak")
     b.add_header("Hubungi Kami")
-    b.add_text("Hubungi Kelompok Tani MekarJaya", 50, 80, 500, 30, bold=True)
+    b.add_text("Hubungi Kelompok Tani BatuMekar", 50, 80, 500, 30, bold=True)
     
     # Left Form
     b.add_card("KIRIM PESAN LANGSUNG", 50, 120, 550, 450)
@@ -556,7 +556,7 @@ def generate_all_mockups(dest_dir):
 
     # Right Info
     b.add_card("INFORMASI KONTOR & LOKASI DESA", 630, 120, 420, 450)
-    b.add_text("Dusun Mekar Sari, Desa BatuMekar,\nKecamatan Lingsar, Kabupaten Lombok Barat,\nNusa Tenggara Barat (NTB).\n\nHP/WA: +62 812-3456-7890\nEmail: admin@mekarjayadu.com", 650, 140, 380, 100)
+    b.add_text("Dusun Mekar Sari, Desa BatuMekar,\nKecamatan Lingsar, Kabupaten Lombok Barat,\nNusa Tenggara Barat (NTB).\n\nHP/WA: +62 812-3456-7890\nEmail: admin@batumekardu.com", 650, 140, 380, 100)
     b.add_box("[ Google Maps - Peta Lokasi Desa BatuMekar ]", 650, 260, 380, 280)
     
     b.add_footer()
@@ -574,7 +574,7 @@ def generate_all_mockups(dest_dir):
     b.add_text("A: Cari produk di menu Katalog, klik '+ Keranjang', setelah selesai klik ikon keranjang belanja lalu klik 'Lanjut ke Checkout'. Isi alamat lengkap pengiriman, kirim order, lakukan transfer bank sesuai nominal, dan unggah foto struk transfer di halaman Konfirmasi Pembayaran.", 70, 170, 960, 50)
     b.add_line(50, 230, 1000, 1)
 
-    b.add_text("Q: Apakah madu MekarJaya terjamin keasliannya?", 70, 245, 960, 20, bold=True)
+    b.add_text("Q: Apakah madu BatuMekar terjamin keasliannya?", 70, 245, 960, 20, bold=True)
     b.add_text("A: Benar-benar murni 100% tanpa bahan campuran sirup/gula dan tanpa melalui proses pemanasan pasteurisasi tinggi (raw honey) sehingga kandungan enzim lebah alami masih terjaga secara utuh.", 70, 270, 960, 40)
     b.add_line(50, 320, 1000, 1)
 
@@ -594,8 +594,8 @@ def generate_all_mockups(dest_dir):
     b.add_text("Masuk ke Akun Anda", 50, 80, 400, 30, bold=True)
     
     b.add_card("LOGIN PENGGUNA", 350, 150, 400, 380)
-    b.add_text("Username atau Email *", 380, 180, 200, 20, bold=True)
-    b.add_input("Masukkan username / email...", 380, 205, 340, 35)
+    b.add_text("Username *", 380, 180, 200, 20, bold=True)
+    b.add_input("Masukkan username...", 380, 205, 340, 35)
     
     b.add_text("Password *", 380, 255, 200, 20, bold=True)
     b.add_input("••••••••••••", 380, 280, 340, 35)
@@ -605,7 +605,7 @@ def generate_all_mockups(dest_dir):
     
     b.add_button("Masuk Sekarang", 380, 375, 340, 40, bold=True)
     
-    b.add_text("Belum punya akun MekarJaya? Daftar di sini", 380, 440, 340, 20, align="center")
+    b.add_text("Belum punya akun BatuMekar? Daftar di sini", 380, 440, 340, 20, align="center")
     b.add_button("Daftar Akun Baru", 450, 470, 200, 30)
     
     b.add_footer()
@@ -616,29 +616,26 @@ def generate_all_mockups(dest_dir):
     b.add_header("Bantuan")
     b.add_text("Registrasi Akun Baru", 50, 80, 400, 30, bold=True)
     
-    b.add_card("BUAT AKUN MEKARJAYA", 300, 110, 500, 570)
+    b.add_card("BUAT AKUN BATUMEKAR", 300, 110, 500, 470)
     b.add_text("Nama Lengkap Anda *", 330, 130, 200, 20, bold=True)
     b.add_input("Indra Pratama", 330, 150, 440, 30)
 
-    b.add_text("Alamat Email Aktif *", 330, 190, 200, 20, bold=True)
-    b.add_input("indra@mail.com", 330, 210, 440, 30)
+    b.add_text("Nomor WhatsApp *", 330, 190, 200, 20, bold=True)
+    b.add_input("081234567890", 330, 210, 440, 30)
 
-    b.add_text("Nomor WhatsApp *", 330, 250, 200, 20, bold=True)
-    b.add_input("081234567890", 330, 270, 440, 30)
+    b.add_text("Pilih Username *", 330, 250, 200, 20, bold=True)
+    b.add_input("indra12", 330, 270, 440, 30)
 
-    b.add_text("Pilih Username *", 330, 310, 200, 20, bold=True)
-    b.add_input("indra12", 330, 330, 440, 30)
+    b.add_text("Password Akun *", 330, 310, 200, 20, bold=True)
+    b.add_input("••••••••••••", 330, 330, 440, 30)
 
-    b.add_text("Password Akun *", 330, 370, 200, 20, bold=True)
+    b.add_text("Ulangi Password *", 330, 370, 200, 20, bold=True)
     b.add_input("••••••••••••", 330, 390, 440, 30)
-
-    b.add_text("Ulangi Password *", 330, 430, 200, 20, bold=True)
-    b.add_input("••••••••••••", 330, 450, 440, 30)
     
-    b.add_text("Daftar Sebagai:  [x] Pelanggan Umum    [ ] Reseller Madu", 330, 495, 440, 20, bold=True)
+    b.add_text("Daftar Sebagai:  [x] Pelanggan Umum    [ ] Reseller Madu", 330, 435, 440, 20, bold=True)
     
-    b.add_button("Daftar Sekarang", 330, 535, 440, 40, bold=True)
-    b.add_text("Sudah punya akun? Login di sini", 330, 595, 440, 20, align="center")
+    b.add_button("Daftar Sekarang", 330, 475, 440, 40, bold=True)
+    b.add_text("Sudah punya akun? Login di sini", 330, 535, 440, 20, align="center")
 
     b.add_footer()
     b.save(os.path.join(dest_dir, "15_register.drawio"))
@@ -720,14 +717,11 @@ def generate_all_mockups(dest_dir):
     b.add_text("Nama Lengkap", 300, 160, 150, 20, bold=True)
     b.add_input("Indra Pratama", 300, 185, 340, 30)
 
-    b.add_text("Alamat Email", 670, 160, 150, 20, bold=True)
-    b.add_input("indra@mail.com", 670, 185, 340, 30)
+    b.add_text("Username (Tidak dapat diubah)", 670, 160, 200, 20, bold=True)
+    b.add_input("indra12", 670, 185, 340, 30)
 
     b.add_text("Nomor WhatsApp", 300, 230, 150, 20, bold=True)
     b.add_input("081234567890", 300, 255, 340, 30)
-
-    b.add_text("Username (Tidak dapat diubah)", 670, 230, 200, 20, bold=True)
-    b.add_input("indra12", 670, 255, 340, 30)
     
     b.add_line(300, 310, 710, 1)
     
@@ -953,5 +947,5 @@ def generate_all_mockups(dest_dir):
 
 
 if __name__ == "__main__":
-    dest = "/var/home/indra12/skripsi/MekarJaya/diagram/desain"
+    dest = os.path.join(os.path.dirname(os.path.abspath(__file__)), "desain")
     generate_all_mockups(dest)
