@@ -13,6 +13,21 @@ function e($string) {
 }
 
 /**
+ * Gets the base URL path for the project (e.g. /batumekar/ or /)
+ * Handles subdirectory deployment (XAMPP, shared hosting, etc.)
+ */
+function base_url($path = '') {
+    static $base = null;
+    if ($base === null) {
+        $script_dir = dirname($_SERVER['SCRIPT_NAME']);
+        // Strip known subdirectory segments to always get the project root
+        $script_dir = preg_replace('#/(admin|account|reseller)(/.*)?$#', '', $script_dir);
+        $base = rtrim($script_dir, '/') . '/';
+    }
+    return $base . ltrim($path, '/');
+}
+
+/**
  * Basic Authentication Check
  */
 function require_login() {
@@ -20,8 +35,7 @@ function require_login() {
         session_start();
     }
     if (!isset($_SESSION['user_id'])) {
-        $prefix = (str_starts_with($_SERVER['PHP_SELF'], '/account/') || str_starts_with($_SERVER['PHP_SELF'], '/admin/') || str_starts_with($_SERVER['PHP_SELF'], '/reseller/')) ? '../' : '';
-        header("Location: " . $prefix . "login.php");
+        header("Location: " . base_url('login.php'));
         exit;
     }
 }
@@ -34,8 +48,7 @@ function require_admin() {
         session_start();
     }
     if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-        $prefix = (str_starts_with($_SERVER['PHP_SELF'], '/account/') || str_starts_with($_SERVER['PHP_SELF'], '/admin/') || str_starts_with($_SERVER['PHP_SELF'], '/reseller/')) ? '../' : '';
-        header("Location: " . $prefix . "login.php");
+        header("Location: " . base_url('login.php'));
         exit;
     }
 }
@@ -72,7 +85,7 @@ function get_all_blog_posts($pdo) {
 function img_url($path) {
     if (!$path) return '';
     if (str_starts_with($path, '/') || str_starts_with($path, 'http')) return $path;
-    return '../' . $path;
+    return base_url($path);
 }
 
 function ensure_size_table($pdo) {

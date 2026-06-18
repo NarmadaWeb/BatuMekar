@@ -330,7 +330,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 </form>
 
                                 <?php if ($order['bukti_pembayaran']): ?>
-                                    <a href="<?php echo e($order['bukti_pembayaran']); ?>" target="_blank" class="btn" style="padding: 8px 14px; font-size: 12px; background: #f1f5f9; color: #334155; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                                    <a href="<?php echo e(img_url($order['bukti_pembayaran'])); ?>" target="_blank" class="btn" style="padding: 8px 14px; font-size: 12px; background: #f1f5f9; color: #334155; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
                                         <span class="material-symbols-outlined" style="font-size: 16px;">image</span> Lihat Bukti Bayar
                                     </a>
                                 <?php endif; ?>

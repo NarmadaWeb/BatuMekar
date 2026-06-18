@@ -192,7 +192,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <div id="preview-container" style="margin-top: 10px;">
                             <?php if ($edit_post && $edit_post['gambar']): ?>
                                 <div style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
-                                    <img src="<?php echo e($edit_post['gambar']); ?>" style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px;">
+                                    <img src="<?php echo e(img_url($edit_post['gambar'])); ?>" style="width: 80px; height: 50px; object-fit: cover; border-radius: 6px;">
                                     <div>
                                         <div style="font-size: 13px; font-weight: 600; color: #334155;">Gambar saat ini</div>
                                         <div style="font-size: 11px; color: #94a3b8;">Kosongkan jika tidak ingin mengubah</div>
@@ -238,7 +238,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <td style="padding: 14px 20px;">
                                     <div style="display: flex; align-items: center; gap: 12px;">
                                         <?php if ($post['gambar']): ?>
-                                            <img src="<?php echo e($post['gambar']); ?>" style="width: 40px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
+                                            <img src="<?php echo e(img_url($post['gambar'])); ?>" style="width: 40px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;">
                                         <?php endif; ?>
                                         <div>
                                             <div style="font-weight: 600; color: #334155;"><?php echo e($post['judul']); ?></div>

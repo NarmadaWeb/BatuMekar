@@ -12,8 +12,8 @@ if (isset($_SESSION['cart'])) {
     }
 }
 
-// Calculate relative path prefix
-$prefix = (str_starts_with($_SERVER['PHP_SELF'], '/account/') || str_starts_with($_SERVER['PHP_SELF'], '/admin/') || str_starts_with($_SERVER['PHP_SELF'], '/reseller/')) ? '../' : '';
+// Calculate base URL path (handles subdirectory deployment)
+$prefix = base_url();
 ?>
 <!DOCTYPE html>
 <html lang="id">

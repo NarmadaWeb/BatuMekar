@@ -1,6 +1,6 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
-$prefix = (str_starts_with($_SERVER['PHP_SELF'], '/account/') || str_starts_with($_SERVER['PHP_SELF'], '/admin/') || str_starts_with($_SERVER['PHP_SELF'], '/reseller/')) ? '../' : '';
+$prefix = base_url();
 function footer_link($href, $icon, $label) {
     global $current_page, $prefix;
     $active = basename($href) === $current_page;
