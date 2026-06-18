@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 ?>
 <main>
     <section class="hero">
-        <img class="hero-img" src="assets/images/village_hero.jpg" alt="Desa BatuMekar"/>
+        <img class="hero-img" src="<?php echo base_url('assets/images/village_hero.jpg'); ?>" alt="Desa BatuMekar"/>
         <div class="container" style="text-align: center;">
             <span style="background: var(--primary-container); color: var(--on-primary-container); padding: 4px 16px; border-radius: 20px; font-weight: 700; margin-bottom: 24px; display: inline-block;">WARISAN DESA</span>
             <h1 style="font-size: 56px; margin-bottom: 24px;">Jantung Desa BatuMekar</h1>
@@ -21,7 +21,7 @@ require_once 'includes/header.php';
                     <p>Setiap panen diawali dengan 'Ritual Batu', upacara syukur yang memastikan lebah tetap aman dan hutan terus tumbuh subur.</p>
                 </div>
             </div>
-            <img src="assets/images/honey_bowl.jpg" alt="Madu" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <img src="<?php echo base_url('assets/images/honey_bowl.jpg'); ?>" alt="Madu" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
         </div>
     </section>
 </main>

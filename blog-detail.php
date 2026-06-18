@@ -32,7 +32,7 @@ require_once 'includes/header.php';
             <h1 style="font-size: 40px; margin-bottom: 24px; line-height: 1.2;"><?php echo e($post['judul']); ?></h1>
 
             <?php if ($post['gambar']): ?>
-            <img src="<?php echo e($post['gambar']); ?>" alt="<?php echo e($post['judul']); ?>" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; margin-bottom: 32px;">
+            <img src="<?php echo e(img_url($post['gambar'])); ?>" alt="<?php echo e($post['judul']); ?>" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; margin-bottom: 32px;">
             <?php endif; ?>
 
             <div style="font-size: 18px; color: var(--secondary); font-weight: 600; margin-bottom: 24px; line-height: 1.6; font-style: italic;">

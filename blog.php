@@ -11,7 +11,7 @@ $posts = get_all_blog_posts($pdo);
         <div class="grid grid-3">
             <?php foreach ($posts as $post): ?>
             <article class="card" style="padding: 0; overflow: hidden;">
-                <img src="<?php echo e($post['gambar']); ?>" alt="<?php echo e($post['judul']); ?>" style="width: 100%; height: 200px; object-fit: cover;">
+                <img src="<?php echo e(img_url($post['gambar'])); ?>" alt="<?php echo e($post['judul']); ?>" style="width: 100%; height: 200px; object-fit: cover;">
                 <div style="padding: 24px;">
                     <div style="font-size: 12px; font-weight: 700; color: var(--secondary); margin-bottom: 8px; text-transform: uppercase;">
                         <?php echo e($post['kategori'] ?: 'Umum'); ?> • <?php echo e(date('d M Y', strtotime($post['dibuat_pada']))); ?>

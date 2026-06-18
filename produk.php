@@ -41,7 +41,7 @@ $related_products = $related->fetchAll();
             <!-- Left: Image -->
             <div style="position: sticky; top: 32px;">
                 <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #e7e5e4;">
-                    <img src="<?php echo e($product['gambar']); ?>" alt="<?php echo e($product['nama']); ?>" 
+                    <img src="<?php echo e(img_url($product['gambar'])); ?>" alt="<?php echo e($product['nama']); ?>" 
                          style="width: 100%; height: 520px; object-fit: cover; display: block; transition: transform 0.4s ease;"
                          onmouseover="this.style.transform='scale(1.05)'" 
                          onmouseout="this.style.transform='scale(1)'">
@@ -181,7 +181,7 @@ $related_products = $related->fetchAll();
                     <div style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e7e5e4; transition: box-shadow 0.2s, transform 0.2s;" 
                          onmouseover="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.08)'; this.style.transform='translateY(-2px)'" 
                          onmouseout="this.style.boxShadow='none'; this.style.transform='none'">
-                        <img src="<?php echo e($rp['gambar']); ?>" alt="<?php echo e($rp['nama']); ?>" style="width: 100%; height: 180px; object-fit: cover; display: block;">
+                        <img src="<?php echo e(img_url($rp['gambar'])); ?>" alt="<?php echo e($rp['nama']); ?>" style="width: 100%; height: 180px; object-fit: cover; display: block;">
                         <div style="padding: 16px;">
                             <div style="font-weight: 700; color: #292524; font-size: 14px; margin-bottom: 4px;"><?php echo e($rp['nama']); ?></div>
                             <div style="font-weight: 700; color: #d97706; font-size: 15px;"><?php echo e(format_rupiah($rp['harga'])); ?></div>

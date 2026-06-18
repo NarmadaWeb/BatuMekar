@@ -85,7 +85,7 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
                     <h2 style="margin-bottom: 24px;">Ringkasan Pesanan</h2>
                     <?php foreach ($cart_items as $item): ?>
                     <div style="display: flex; gap: 16px; margin-bottom: 16px; align-items: center;">
-                        <img src="<?php echo e($item['gambar']); ?>" alt="<?php echo e($item['nama']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                        <img src="<?php echo e(img_url($item['gambar'])); ?>" alt="<?php echo e($item['nama']); ?>" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                         <div style="flex-grow: 1;">
                             <div style="font-weight: 600; font-size: 14px;"><?php echo e($item['nama']); ?></div>
                             <div style="font-size: 12px; color: var(--on-surface-variant);">

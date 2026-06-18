@@ -51,7 +51,7 @@ try {
             'nama' => 'Madu Multiflora',
             'deskripsi' => 'Madu harian kaya nutrisi dari nektar aneka bunga desa.',
             'harga' => 125000,
-            'gambar' => 'assets/img/produk/multiflora.jpg',
+            'gambar' => 'assets/images/produk/multiflora.jpg',
             'kategori' => 'Multiflora',
             'rating' => 4.9,
             'jumlah_ulasan' => 120,
@@ -62,7 +62,7 @@ try {
             'nama' => 'Madu Kaliandra',
             'deskripsi' => 'Memiliki aroma wangi yang khas dan tekstur lembut.',
             'harga' => 145000,
-            'gambar' => 'assets/img/produk/kaliandra.jpg',
+            'gambar' => 'assets/images/produk/kaliandra.jpg',
             'kategori' => 'Kaliandra',
             'rating' => 4.8,
             'jumlah_ulasan' => 85,
@@ -73,7 +73,7 @@ try {
             'nama' => 'Madu Hutan Liar',
             'deskripsi' => 'Madu murni dari lebah liar di kedalaman hutan pegunungan.',
             'harga' => 160000,
-            'gambar' => 'assets/img/produk/hutan.jpg',
+            'gambar' => 'assets/images/produk/hutan.jpg',
             'kategori' => 'Hutan',
             'rating' => 5.0,
             'jumlah_ulasan' => 210,
@@ -84,7 +84,7 @@ try {
             'nama' => 'Madu Kelengkeng',
             'deskripsi' => 'Nektar bunga kelengkeng memberikan rasa buah yang dominan.',
             'harga' => 135000,
-            'gambar' => 'assets/img/produk/kelengkeng.jpg',
+            'gambar' => 'assets/images/produk/kelengkeng.jpg',
             'kategori' => 'Kelengkeng',
             'rating' => 4.7,
             'jumlah_ulasan' => 94,
@@ -113,7 +113,7 @@ try {
             'konten' => 'Proses pemanenan madu dilakukan secara tradisional dengan menjaga kelestarian koloni lebah liar.',
             'kategori' => 'Panen',
             'penulis' => 'Admin',
-            'gambar' => 'assets/img/blog/panen.jpg'
+            'gambar' => 'assets/images/blog/panen.jpg'
         ]
     ];
 

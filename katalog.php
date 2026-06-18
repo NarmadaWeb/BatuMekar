@@ -90,7 +90,7 @@ if ($search) {
                     ?>
                     <div class="card" style="padding: 0; overflow: hidden;">
                         <a href="produk.php?id=<?php echo e($product['produk_id']); ?>">
-                            <img src="<?php echo e($product['gambar']); ?>" alt="<?php echo e($product['nama']); ?>" style="width: 100%; height: 250px; object-fit: cover;">
+                            <img src="<?php echo e(img_url($product['gambar'])); ?>" alt="<?php echo e($product['nama']); ?>" style="width: 100%; height: 250px; object-fit: cover;">
                         </a>
                         <div style="padding: 24px;">
                             <h3 class="text-secondary"><a href="produk.php?id=<?php echo e($product['produk_id']); ?>"><?php echo e($product['nama']); ?></a></h3>

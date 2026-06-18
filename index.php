@@ -7,7 +7,7 @@ $featured_products = get_featured_products($pdo);
 <main>
     <!-- Hero Section -->
     <section class="hero">
-        <img class="hero-img" src="assets/images/hero.jpg" alt="BatuMekar Hero"/>
+        <img class="hero-img" src="<?php echo base_url('assets/images/hero.jpg'); ?>" alt="BatuMekar Hero"/>
         <div class="container">
             <div class="hero-content">
                 <h1 style="font-size: 56px; margin-bottom: 24px;">Madu Asli dari Hutan Desa BatuMekar</h1>
@@ -49,7 +49,7 @@ $featured_products = get_featured_products($pdo);
                 <div class="card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <a href="produk.php?id=<?php echo e($product['produk_id']); ?>">
-                            <img src="<?php echo e($product['gambar']); ?>" alt="<?php echo e($product['nama']); ?>" style="width: 100%; height: 250px; object-fit: cover;">
+                            <img src="<?php echo e(img_url($product['gambar'])); ?>" alt="<?php echo e($product['nama']); ?>" style="width: 100%; height: 250px; object-fit: cover;">
                         </a>
                         <div style="padding: 24px;">
                             <h3 class="text-secondary" style="font-size: 20px; font-weight: 700; margin-bottom: 8px;"><?php echo e($product['nama']); ?></h3>

@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 ?>
 <main>
     <section class="hero">
-        <img class="hero-img" src="assets/images/hutan.jpg" alt="Harvest Calendar"/>
+        <img class="hero-img" src="<?php echo base_url('assets/images/hutan.jpg'); ?>" alt="Harvest Calendar"/>
         <div class="container" style="text-align: center;">
             <span style="background: var(--primary-container); color: var(--on-primary-container); padding: 4px 16px; border-radius: 20px; font-weight: 700; margin-bottom: 24px; display: inline-block;">HARVEST CALENDAR</span>
             <h1 style="font-size: 56px; margin-bottom: 24px;">Kalender Panen Madu</h1>

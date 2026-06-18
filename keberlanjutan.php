@@ -4,7 +4,7 @@ require_once 'includes/header.php';
 ?>
 <main>
     <section class="hero">
-        <img class="hero-img" src="assets/images/hutan.jpg" alt="Sustainability"/>
+        <img class="hero-img" src="<?php echo base_url('assets/images/hutan.jpg'); ?>" alt="Sustainability"/>
         <div class="container" style="text-align: center;">
             <span style="background: var(--primary-container); color: var(--on-primary-container); padding: 4px 16px; border-radius: 20px; font-weight: 700; margin-bottom: 24px; display: inline-block;">SUSTAINABILITY</span>
             <h1 style="font-size: 56px; margin-bottom: 24px;">Keberlanjutan & Pelestarian</h1>
@@ -20,7 +20,7 @@ require_once 'includes/header.php';
                     <p style="color: var(--on-surface-variant); font-size: 18px; line-height: 1.8; margin-bottom: 16px;">Kami tidak pernah merusak sarang lebah. Madu diambil dengan teknik tradisional yang tidak melukai lebah atau merusak koloni.</p>
                     <p style="color: var(--on-surface-variant); font-size: 18px; line-height: 1.8;">Setiap sarang yang dipanen selalu menyisakan 30% madu sebagai cadangan makanan lebah. Ini adalah prinsip "Batu Mekar" — memberi tanpa mengambil semuanya.</p>
                 </div>
-                <img src="assets/images/honey_bowl.jpg" alt="Sustainable Harvest" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <img src="<?php echo base_url('assets/images/honey_bowl.jpg'); ?>" alt="Sustainable Harvest" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
             </div>
 
             <div class="grid grid-3" style="gap: 32px;">

@@ -109,7 +109,8 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
             <!-- Cart Items -->
             <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px;">
                 <?php foreach ($cart_items as $item):
-                    $img = $item['gambar'] ?: 'assets/images/honey_bowl.jpg';
+                    $img_url_db = img_url($item['gambar']);
+                    $img = $img_url_db ?: base_url('assets/images/honey_bowl.jpg');
                 ?>
                 <div class="card" style="padding: 20px 24px; display: flex; align-items: center; gap: 20px; border-radius: 16px;">
                     <div style="width: 80px; height: 80px; flex-shrink: 0; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc;">
