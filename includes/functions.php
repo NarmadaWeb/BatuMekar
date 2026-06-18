@@ -84,7 +84,7 @@ function get_all_blog_posts($pdo) {
 
 function img_url($path) {
     if (!$path) return '';
-    if (str_starts_with($path, '/') || str_starts_with($path, 'http')) return $path;
+    if (str_starts_with($path, 'http')) return $path;
     return base_url($path);
 }
 

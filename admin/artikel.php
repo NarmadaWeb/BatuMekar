@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!file_exists($upload_dir)) mkdir($upload_dir, 0777, true);
                 $new_file_name = 'artikel_' . time() . '_' . rand(100, 999) . '.' . $file_ext;
                 if (move_uploaded_file($file_tmp, $upload_dir . $new_file_name)) {
-                    $gambar = '/assets/uploads/blog/' . $new_file_name;
+                    $gambar = 'assets/uploads/blog/' . $new_file_name;
                 } else {
                     $error = 'Gagal menyimpan gambar.';
                 }

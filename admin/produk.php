@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     }
                     $new_file_name = 'produk_' . time() . '_' . rand(100, 999) . '.' . $file_ext;
                     if (move_uploaded_file($file_tmp, $upload_dir . $new_file_name)) {
-                        $gambar = '/assets/uploads/produk/' . $new_file_name;
+                        $gambar = 'assets/uploads/produk/' . $new_file_name;
                     } else {
                         $error = 'Gagal menyimpan file. Coba lagi.';
                     }
