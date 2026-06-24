@@ -94,10 +94,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="material-symbols-outlined">dashboard</span>
                     Dashboard
                 </a>
+                <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                 <a href="orders.php" class="sidebar-link">
                     <span class="material-symbols-outlined">shopping_bag</span>
                     Pesanan Saya
                 </a>
+                <?php endif; ?>
                 <a href="profile.php" class="sidebar-link active">
                     <span class="material-symbols-outlined">person</span>
                     Profil Saya

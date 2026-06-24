@@ -36,10 +36,12 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="material-symbols-outlined">dashboard</span>
                     Dashboard
                 </a>
+                <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                 <a href="orders.php" class="sidebar-link">
                     <span class="material-symbols-outlined">shopping_bag</span>
                     Pesanan Saya
                 </a>
+                <?php endif; ?>
                 <a href="profile.php" class="sidebar-link">
                     <span class="material-symbols-outlined">person</span>
                     Profil Saya
@@ -76,7 +78,8 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <!-- Detailed Grid -->
-            <div class="grid grid-2">
+            <div class="grid <?php echo (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') ? '' : 'grid-2'; ?>">
+                <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                 <!-- Recent Orders Card -->
                 <div class="card" style="padding: 28px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -123,6 +126,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <?php endif; ?>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <!-- Quick Actions / Quick Links Card -->
                 <div class="card" style="padding: 28px; display: flex; flex-direction: column; justify-content: space-between;">

@@ -7,9 +7,36 @@ require_once __DIR__ . '/../config/db.php';
 
 require_login();
 
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: dashboard.php');
+    exit;
+}
+
 $stmt = $pdo->prepare("SELECT * FROM pesanan WHERE pengguna_id = ? ORDER BY dibuat_pada DESC");
 $stmt->execute([$_SESSION['user_id']]);
 $orders = $stmt->fetchAll();
+
+$success_message = '';
+$error_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'cancel_order') {
+        $order_id = (int)$_POST['order_id'];
+        $stmt_check = $pdo->prepare("SELECT * FROM pesanan WHERE pesanan_id = ? AND pengguna_id = ? AND status = 'Pending'");
+        $stmt_check->execute([$order_id, $_SESSION['user_id']]);
+        $order = $stmt_check->fetch();
+        if ($order) {
+            $stmt_update = $pdo->prepare("UPDATE pesanan SET status = 'Cancelled' WHERE pesanan_id = ?");
+            $stmt_update->execute([$order_id]);
+            $success_message = "Pesanan #MBM-{$order_id} berhasil dibatalkan.";
+            // Reload orders to reflect cancellation
+            $stmt->execute([$_SESSION['user_id']]);
+            $orders = $stmt->fetchAll();
+        } else {
+            $error_message = "Pesanan tidak dapat dibatalkan.";
+        }
+    }
+}
 
 // Fetch order items for each order
 $orders_with_items = [];
@@ -57,6 +84,19 @@ require_once __DIR__ . '/../includes/header.php';
         <!-- Main Orders Content -->
         <section style="flex-grow: 1;">
             <h1 style="font-size: 32px; margin-bottom: 32px; color: var(--secondary); font-weight: 800;">Riwayat Pesanan</h1>
+
+            <?php if ($success_message): ?>
+                <div style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; padding: 16px; border-radius: 12px; margin-bottom: 24px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <?php echo e($success_message); ?>
+                </div>
+            <?php endif; ?>
+            <?php if ($error_message): ?>
+                <div style="background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; padding: 16px; border-radius: 12px; margin-bottom: 24px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">error</span>
+                    <?php echo e($error_message); ?>
+                </div>
+            <?php endif; ?>
 
             <div style="display: flex; flex-direction: column; gap: 24px;">
                 <?php if (empty($orders)): ?>
@@ -114,10 +154,49 @@ require_once __DIR__ . '/../includes/header.php';
                                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: 12px;">
                                         <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
                                         
-                                        <?php if ($status === 'pending' && $order['metode_pembayaran'] === 'Midtrans'): ?>
-                                            <a href="../pembayaran.php?order_id=<?php echo $order['pesanan_id']; ?>&method=midtrans" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; justify-content: center; text-decoration: none; border-radius: 6px; font-weight: 600; background: #3b82f6; border-color: #3b82f6;">
-                                                <span class="material-symbols-outlined" style="font-size: 16px;">payments</span> Bayar Sekarang
-                                            </a>
+                                        <?php if ($status === 'pending'): ?>
+                                            <?php if ($order['metode_pembayaran'] === 'Midtrans'): ?>
+                                                <a href="../pembayaran.php?order_id=<?php echo $order['pesanan_id']; ?>&method=midtrans" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; justify-content: center; text-decoration: none; border-radius: 6px; font-weight: 600; background: #3b82f6; border-color: #3b82f6;">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">payments</span> Bayar Sekarang
+                                                </a>
+                                            <?php endif; ?>
+                                            
+                                            <form action="orders.php" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')" style="display:inline; margin:0;">
+                                                <input type="hidden" name="action" value="cancel_order">
+                                                <input type="hidden" name="order_id" value="<?php echo $order['pesanan_id']; ?>">
+                                                <button type="submit" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px; border-radius: 6px; font-weight: 600; color: #dc2626; border-color: #fca5a5; background: #fef2f2; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fca5a5;">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">cancel</span> Batalkan Pesanan
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        <?php if ($status === 'completed'): ?>
+                                            <?php 
+                                                // Check if already returned
+                                                $stmt_ret = $pdo->prepare("SELECT * FROM pengembalian_pesanan WHERE pesanan_id = ?");
+                                                $stmt_ret->execute([$order['pesanan_id']]);
+                                                $return_data = $stmt_ret->fetch();
+                                            ?>
+                                            <?php if (!$return_data): ?>
+                                                <a href="return.php?order_id=<?php echo $order['pesanan_id']; ?>" class="btn" style="padding: 8px 16px; font-size: 12px; border-radius: 6px; font-weight: 600; color: #d97706; border: 1px solid #fde68a; background: #fffbeb; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">assignment_return</span> Ajukan Pengembalian
+                                                </a>
+                                            <?php else: ?>
+                                                <?php 
+                                                    $ret_bg = '#f1f5f9';
+                                                    $ret_fg = '#475569';
+                                                    if ($return_data['status'] === 'Disetujui') {
+                                                        $ret_bg = '#d1fae5';
+                                                        $ret_fg = '#065f46';
+                                                    } elseif ($return_data['status'] === 'Ditolak') {
+                                                        $ret_bg = '#fee2e2';
+                                                        $ret_fg = '#991b1b';
+                                                    }
+                                                ?>
+                                                <span style="font-size: 12px; padding: 6px 12px; border-radius: 6px; font-weight: 600; background: <?php echo $ret_bg; ?>; color: <?php echo $ret_fg; ?>; border: 1px solid rgba(0,0,0,0.05); display: inline-flex; align-items: center; gap: 4px;">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">info</span> Return: <?php echo e($return_data['status']); ?>
+                                                </span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -152,8 +231,28 @@ require_once __DIR__ . '/../includes/header.php';
                                                 </div>
                                             </div>
                                         </div>
-                                        <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">
-                                            <?php echo e(format_rupiah($item['quantity'] * $item['price'])); ?>
+                                        <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                                            <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">
+                                                <?php echo e(format_rupiah($item['quantity'] * $item['price'])); ?>
+                                            </div>
+                                            
+                                            <?php if ($status === 'completed'): ?>
+                                                <?php
+                                                    // Check if already reviewed
+                                                    $stmt_rev = $pdo->prepare("SELECT * FROM ulasan_produk WHERE produk_id = ? AND pengguna_id = ?");
+                                                    $stmt_rev->execute([$item['produk_id'], $_SESSION['user_id']]);
+                                                    $review_data = $stmt_rev->fetch();
+                                                ?>
+                                                <?php if (!$review_data): ?>
+                                                    <a href="review.php?product_id=<?php echo $item['produk_id']; ?>&order_id=<?php echo $order['pesanan_id']; ?>" style="padding: 4px 10px; font-size: 11px; background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px;">star</span> Beri Ulasan
+                                                    </a>
+                                                <?php else: ?>
+                                                    <span style="font-size: 11px; color: #10b981; font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                                                        <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span> Sudah Diulas (<?php echo $review_data['rating']; ?>★)
+                                                    </span>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                     <?php endforeach; ?>

@@ -1,33 +1,21 @@
 <?php
-// MySQL Database Configuration (Preferred)
-$mysql_host = getenv('MYSQL_HOST') ?: 'localhost';
+// MySQL Database Connection Configuration (Exclusive)
+$mysql_host = getenv('MYSQL_HOST') ?: '127.0.0.1';
 $mysql_db   = getenv('MYSQL_DATABASE') ?: 'madu';
 $mysql_user = getenv('MYSQL_USER') ?: 'root';
 $mysql_pass = getenv('MYSQL_PASSWORD') ?: 'root';
+$charset    = 'utf8mb4';
 
-// SQLite Database Path (Fallback for Sandbox)
-$sqlite_path = __DIR__ . '/../data/database.sqlite';
+$dsn = "mysql:host=$mysql_host;dbname=$mysql_db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
 
 try {
-    if (getenv('MYSQL_HOST')) {
-        // Attempt MySQL connection if host is provided
-        $pdo = new PDO("mysql:host=$mysql_host;dbname=$mysql_db;charset=utf8mb4", $mysql_user, $mysql_pass);
-    } else {
-        // Fallback to SQLite
-        $pdo = new PDO("sqlite:" . $sqlite_path);
-    }
-
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-} catch (PDOException $e) {
-    // If MySQL failed, try SQLite directly as last resort
-    try {
-        $pdo = new PDO("sqlite:" . $sqlite_path);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    } catch (PDOException $e2) {
-        die("Database connection failed: " . $e2->getMessage());
-    }
+    $pdo = new PDO($dsn, $mysql_user, $mysql_pass, $options);
+} catch (\PDOException $e) {
+    die("Database connection failed (MySQL): " . $e->getMessage());
 }
 ?>

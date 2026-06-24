@@ -43,13 +43,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'update_status') {
         $order_id = (int)$_POST['order_id'];
         $new_status = trim($_POST['status'] ?? '');
-        if (in_array($new_status, ['Pending', 'Processed', 'Shipped', 'Completed'])) {
+        if (in_array($new_status, ['Pending', 'Processed', 'Shipped', 'Completed', 'Returned'])) {
             try {
                 $stmt = $pdo->prepare("UPDATE pesanan SET status = ? WHERE pesanan_id = ?");
                 $stmt->execute([$new_status, $order_id]);
                 $msg = "Status pesanan #MBM-{$order_id} berhasil diperbarui.";
             } catch (PDOException $e) {
                 $error = "Gagal memperbarui status: " . $e->getMessage();
+            }
+        }
+    } elseif ($_POST['action'] === 'handle_return') {
+        $return_id = (int)$_POST['return_id'];
+        $new_status = trim($_POST['status'] ?? '');
+        if (in_array($new_status, ['Disetujui', 'Ditolak'])) {
+            try {
+                $stmt = $pdo->prepare("UPDATE pengembalian_pesanan SET status = ? WHERE pengembalian_id = ?");
+                $stmt->execute([$new_status, $return_id]);
+                
+                // Get the return request info to find order ID
+                $stmt_ret = $pdo->prepare("SELECT * FROM pengembalian_pesanan WHERE pengembalian_id = ?");
+                $stmt_ret->execute([$return_id]);
+                $ret_req = $stmt_ret->fetch();
+                
+                if ($ret_req) {
+                    if ($new_status === 'Disetujui') {
+                        $stmt_up_order = $pdo->prepare("UPDATE pesanan SET status = 'Returned' WHERE pesanan_id = ?");
+                        $stmt_up_order->execute([$ret_req['pesanan_id']]);
+                    }
+                }
+                
+                $msg = "Pengajuan pengembalian berhasil di-" . strtolower($new_status) . ".";
+            } catch (PDOException $e) {
+                $error = "Gagal memperbarui status pengembalian: " . $e->getMessage();
             }
         }
     }
@@ -103,6 +128,12 @@ foreach ($orders as $order) {
         $item['ukuran_label'] = $size_label;
     }
     unset($item);
+    
+    // Fetch return request if any
+    $stmt_ret = $pdo->prepare("SELECT * FROM pengembalian_pesanan WHERE pesanan_id = ?");
+    $stmt_ret->execute([$order['pesanan_id']]);
+    $order['return_request'] = $stmt_ret->fetch();
+    
     $orders_with_items[] = $order;
 }
 $orders = $orders_with_items;
@@ -208,6 +239,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <a href="pesanan.php?status=Processed" class="btn <?php echo $status_filter === 'Processed' ? 'btn-primary' : 'btn-secondary'; ?>" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 8px;">Diproses</a>
                     <a href="pesanan.php?status=Shipped" class="btn <?php echo $status_filter === 'Shipped' ? 'btn-primary' : 'btn-secondary'; ?>" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 8px;">Dikirim</a>
                     <a href="pesanan.php?status=Completed" class="btn <?php echo $status_filter === 'Completed' ? 'btn-primary' : 'btn-secondary'; ?>" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 8px;">Selesai</a>
+                    <a href="pesanan.php?status=Returned" class="btn <?php echo $status_filter === 'Returned' ? 'btn-primary' : 'btn-secondary'; ?>" style="padding: 8px 16px; font-size: 13px; text-decoration: none; border-radius: 8px;">Returned</a>
                 </div>
                 <form action="pesanan.php" method="GET" style="display: flex; gap: 8px;">
                     <?php if ($status_filter): ?>
@@ -231,18 +263,25 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php else: ?>
                     <?php foreach ($orders as $order): ?>
                     <?php
-                        $status_class = 'badge-pending';
-                        $status_text = 'Menunggu Pembayaran';
                         $s = strtolower($order['status'] ?? 'pending');
+                        $badge_style = 'background: #fffbeb; color: #d97706; border: 1px solid #fde68a;';
+                        $status_text = 'Menunggu Pembayaran';
+                        
                         if ($s === 'completed') {
-                            $status_class = 'badge-completed';
+                            $badge_style = 'background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;';
                             $status_text = 'Selesai';
                         } elseif ($s === 'shipped') {
-                            $status_class = 'badge-shipped';
+                            $badge_style = 'background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd;';
                             $status_text = 'Dikirim';
                         } elseif ($s === 'processed') {
-                            $status_class = 'badge-processed';
+                            $badge_style = 'background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;';
                             $status_text = 'Diproses';
+                        } elseif ($s === 'returned') {
+                            $badge_style = 'background: #f5f5f4; color: #57534e; border: 1px solid #e7e5e4;';
+                            $status_text = 'Returned';
+                        } elseif ($s === 'cancelled' || $s === 'canceled') {
+                            $badge_style = 'background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5;';
+                            $status_text = 'Dibatalkan';
                         }
                     ?>
                     <div class="order-card" style="border-radius: 16px; background: white; border: 1px solid rgba(0,0,0,0.05); overflow: hidden;">
@@ -252,7 +291,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">ID Pesanan</span>
                                     <div style="font-weight: 800; font-size: 16px; color: var(--primary); margin-top: 2px;">#MBM-<?php echo e($order['pesanan_id']); ?></div>
                                 </div>
-                                <span class="badge <?php echo $status_class; ?>"><?php echo $status_text; ?></span>
+                                <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; display: inline-block; <?php echo $badge_style; ?>"><?php echo $status_text; ?></span>
                             </div>
                             <div style="text-align: right;">
                                 <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Tanggal</span>
@@ -311,6 +350,73 @@ require_once __DIR__ . '/../includes/header.php';
                             </div>
                             <?php endif; ?>
 
+                            <!-- Return Request Detail -->
+                            <?php if (!empty($order['return_request'])): 
+                                $ret = $order['return_request'];
+                                $ret_status = $ret['status'];
+                                $ret_bg = '#fef3c7';
+                                $ret_border = '#fde68a';
+                                $ret_fg = '#92400e';
+                                if ($ret_status === 'Disetujui') {
+                                    $ret_bg = '#ecfdf5';
+                                    $ret_border = '#a7f3d0';
+                                    $ret_fg = '#065f46';
+                                } elseif ($ret_status === 'Ditolak') {
+                                    $ret_bg = '#fef2f2';
+                                    $ret_border = '#fca5a5';
+                                    $ret_fg = '#991b1b';
+                                }
+                            ?>
+                            <div style="margin-top: 16px; padding: 18px; border-radius: 12px; background: <?php echo $ret_bg; ?>; border: 1px solid <?php echo $ret_border; ?>; color: <?php echo $ret_fg; ?>; margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <div style="font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 6px; color: <?php echo $ret_fg; ?>;">
+                                        <span class="material-symbols-outlined">assignment_return</span>
+                                        Detail Pengajuan Pengembalian (Return)
+                                    </div>
+                                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;"><?php echo $ret_status; ?></span>
+                                </div>
+                                <div style="font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
+                                    <strong>Alasan:</strong> <?php echo e($ret['alasan']); ?>
+                                </div>
+                                <div style="margin-bottom: 16px;">
+                                    <strong>Bukti File:</strong><br>
+                                    <?php 
+                                        $file_path = '../' . $ret['bukti_file']; 
+                                        $ext = strtolower(pathinfo($ret['bukti_file'], PATHINFO_EXTENSION));
+                                        $is_video = in_array($ext, ['mp4', 'mov', 'avi', 'webm', '3gp']);
+                                    ?>
+                                    <?php if ($is_video): ?>
+                                        <video src="<?php echo e(img_url($ret['bukti_file'])); ?>" controls style="max-width: 100%; max-height: 240px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(0,0,0,0.1);"></video>
+                                    <?php else: ?>
+                                        <a href="<?php echo e(img_url($ret['bukti_file'])); ?>" target="_blank" style="display: inline-block; margin-top: 8px;">
+                                            <img src="<?php echo e(img_url($ret['bukti_file'])); ?>" alt="Bukti Return" style="max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); object-fit: contain;">
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <?php if ($ret_status === 'Pending'): ?>
+                                    <div style="display: flex; gap: 8px;">
+                                        <form action="pesanan.php" method="POST" style="margin: 0;">
+                                            <input type="hidden" name="action" value="handle_return">
+                                            <input type="hidden" name="return_id" value="<?php echo $ret['pengembalian_id']; ?>">
+                                            <input type="hidden" name="status" value="Disetujui">
+                                            <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 6px; background: #059669; border-color: #059669; cursor: pointer; color: white;">
+                                                Setujui Return
+                                            </button>
+                                        </form>
+                                        <form action="pesanan.php" method="POST" style="margin: 0;">
+                                            <input type="hidden" name="action" value="handle_return">
+                                            <input type="hidden" name="return_id" value="<?php echo $ret['pengembalian_id']; ?>">
+                                            <input type="hidden" name="status" value="Ditolak">
+                                            <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 6px; color: #dc2626; border: 1px solid #fca5a5; background: #fef2f2; cursor: pointer;">
+                                                Tolak Return
+                                            </button>
+                                        </form>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+
                             <!-- Action: Update Status -->
                             <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                                 <form action="pesanan.php" method="POST" style="display: flex; align-items: center; gap: 8px; margin: 0;">
@@ -322,6 +428,7 @@ require_once __DIR__ . '/../includes/header.php';
                                         <option value="Processed" <?php if ($s === 'processed') echo 'selected'; ?>>Diproses</option>
                                         <option value="Shipped" <?php if ($s === 'shipped') echo 'selected'; ?>>Dikirim</option>
                                         <option value="Completed" <?php if ($s === 'completed') echo 'selected'; ?>>Selesai</option>
+                                        <option value="Returned" <?php if ($s === 'returned') echo 'selected'; ?>>Returned / Dikembalikan</option>
                                     </select>
                                 </form>
 

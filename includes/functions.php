@@ -102,6 +102,52 @@ function ensure_size_table($pdo) {
     try {
         $pdo->exec("ALTER TABLE detail_pesanan ADD COLUMN ukuran_id INTEGER DEFAULT NULL");
     } catch (PDOException $e) {}
+
+    // Ensure extra tables (reviews and returns)
+    try {
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        if ($driver === 'mysql') {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ulasan_produk (
+                ulasan_id INT AUTO_INCREMENT PRIMARY KEY,
+                produk_id INT NOT NULL,
+                pengguna_id INT NOT NULL,
+                rating INT NOT NULL,
+                ulasan TEXT,
+                dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (produk_id) REFERENCES produk(produk_id) ON DELETE CASCADE,
+                FOREIGN KEY (pengguna_id) REFERENCES pengguna(pengguna_id) ON DELETE CASCADE
+            )");
+            $pdo->exec("CREATE TABLE IF NOT EXISTS pengembalian_pesanan (
+                pengembalian_id INT AUTO_INCREMENT PRIMARY KEY,
+                pesanan_id INT NOT NULL,
+                pengguna_id INT NOT NULL,
+                bukti_file VARCHAR(255) NOT NULL,
+                alasan TEXT NOT NULL,
+                status VARCHAR(20) DEFAULT 'Pending',
+                dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (pesanan_id) REFERENCES pesanan(pesanan_id) ON DELETE CASCADE,
+                FOREIGN KEY (pengguna_id) REFERENCES pengguna(pengguna_id) ON DELETE CASCADE
+            )");
+        } else {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS ulasan_produk (
+                ulasan_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                produk_id INTEGER NOT NULL,
+                pengguna_id INTEGER NOT NULL,
+                rating INTEGER NOT NULL,
+                ulasan TEXT,
+                dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            $pdo->exec("CREATE TABLE IF NOT EXISTS pengembalian_pesanan (
+                pengembalian_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pesanan_id INTEGER NOT NULL,
+                pengguna_id INTEGER NOT NULL,
+                bukti_file TEXT NOT NULL,
+                alasan TEXT NOT NULL,
+                status TEXT DEFAULT 'Pending',
+                dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+        }
+    } catch (PDOException $e) {}
 }
 
 function get_product_sizes($pdo, $product_id) {

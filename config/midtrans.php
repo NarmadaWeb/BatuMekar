@@ -10,7 +10,7 @@ function midtrans_get_snap_token($order_id, $gross_amount, $items, $customer, $f
         : 'https://app.midtrans.com/snap/v1/transactions';
 
     $server_key = MIDTRANS_SERVER_KEY;
-    $order_id_str = 'MBM-' . $order_id;
+    $order_id_str = 'MBM-' . $order_id . '-' . time();
 
     $params = [
         'transaction_details' => [
@@ -40,7 +40,9 @@ function midtrans_get_snap_token($order_id, $gross_amount, $items, $customer, $f
     $response = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $error = curl_error($ch);
-    curl_close($ch);
+    if (PHP_VERSION_ID < 80000) {
+        curl_close($ch);
+    }
 
     if ($http_code !== 201) {
         error_log("Midtrans API error (HTTP $http_code): " . ($response ?: $error));

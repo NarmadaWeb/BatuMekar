@@ -17,6 +17,17 @@ require_once 'includes/header.php';
 $related = $pdo->prepare("SELECT * FROM produk WHERE kategori = ? AND produk_id != ? ORDER BY dibuat_pada DESC LIMIT 4");
 $related->execute([$product['kategori'], $id]);
 $related_products = $related->fetchAll();
+
+// Fetch product reviews
+$stmt_reviews = $pdo->prepare("
+    SELECT u.*, p.nama, p.foto_profil 
+    FROM ulasan_produk u 
+    JOIN pengguna p ON u.pengguna_id = p.pengguna_id 
+    WHERE u.produk_id = ? 
+    ORDER BY u.dibuat_pada DESC
+");
+$stmt_reviews->execute([$id]);
+$reviews = $stmt_reviews->fetchAll();
 ?>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,50..200">
 
@@ -164,6 +175,46 @@ $related_products = $related->fetchAll();
                     <div style="color: #57534e; line-height: 1.8; font-size: 15px; white-space: pre-wrap;">
                         <?php echo e($product['deskripsi']); ?>
                     </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div style="border-top: 1px solid #e7e5e4; padding-top: 28px; margin-top: 28px;">
+                    <h2 style="font-size: 20px; font-weight: 800; color: #292524; margin: 0 0 20px 0; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 24px; color: #f59e0b;">star</span>
+                        Ulasan Pembeli (<?php echo count($reviews); ?>)
+                    </h2>
+                    
+                    <?php if (empty($reviews)): ?>
+                        <p style="color: #78716c; font-size: 14px; font-style: italic; margin: 0;">Belum ada ulasan untuk produk ini.</p>
+                    <?php else: ?>
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <?php foreach ($reviews as $rev): ?>
+                                <div style="background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; padding: 16px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #e7e5e4; display: flex; align-items: center; justify-content: center; overflow: hidden; font-weight: 700; color: #78716c; font-size: 14px;">
+                                                <?php if (!empty($rev['foto_profil'])): ?>
+                                                    <img src="<?php echo e(img_url($rev['foto_profil'])); ?>" alt="<?php echo e($rev['nama']); ?>" style="width:100%; height:100%; object-fit:cover;">
+                                                <?php else: ?>
+                                                    <?php echo strtoupper(substr($rev['nama'], 0, 1)); ?>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 14px; font-weight: 700; color: #292524;"><?php echo e($rev['nama']); ?></div>
+                                                <div style="font-size: 11px; color: #a8a29e;"><?php echo e(date('d M Y', strtotime($rev['dibuat_pada']))); ?></div>
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 2px;">
+                                            <?php for ($star = 1; $star <= 5; $star++): ?>
+                                                <span class="material-symbols-outlined" style="font-size: 16px; color: <?php echo $star <= $rev['rating'] ? '#f59e0b' : '#e7e5e4'; ?>;">star</span>
+                                            <?php endfor; ?>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 14px; color: #57534e; line-height: 1.6; white-space: pre-wrap;"><?php echo e($rev['ulasan']); ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
