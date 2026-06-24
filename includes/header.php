@@ -41,7 +41,9 @@ $prefix = base_url();
             <a href="<?php echo $prefix; ?>tentang-desa.php" class="text-secondary">Tentang Kami</a>
             <a href="<?php echo $prefix; ?>blog.php" class="text-secondary">Blog</a>
             <a href="<?php echo $prefix; ?>bantuan.php" class="text-secondary">Bantuan</a>
+            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
             <a href="<?php echo $prefix; ?>katalog.php" class="text-secondary">Katalog Belanja</a>
+            <?php endif; ?>
         </div>
         <div class="nav-actions" style="display: flex; align-items: center; gap: 16px;">
             <button onclick="toggleSearch()" class="text-primary" style="background: none; border: none; padding: 0; cursor: pointer; display: flex; align-items: center;" title="Cari produk">
@@ -82,12 +84,14 @@ $prefix = base_url();
             });
             </script>
             
+            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
             <a href="<?php echo $prefix; ?>keranjang.php" class="text-primary" style="position: relative; text-decoration: none;">
                 <span class="material-symbols-outlined">shopping_cart</span>
                 <?php if ($cart_count > 0): ?>
                     <span style="position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold;"><?php echo e($cart_count); ?></span>
                 <?php endif; ?>
             </a>
+            <?php endif; ?>
             
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Logged In Links -->

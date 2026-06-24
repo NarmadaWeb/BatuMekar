@@ -11,6 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_SESSION['cart'])) {
 }
 
 require_login();
+
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: admin/dashboard.php');
+    exit;
+}
 $user_id = $_SESSION['user_id'];
 $name = $_POST['name'] ?? '';
 $phone = $_POST['phone'] ?? '';

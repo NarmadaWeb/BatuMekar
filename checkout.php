@@ -8,6 +8,11 @@ require_once 'config/db.php';
 // Enforce login
 require_login();
 
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: admin/dashboard.php');
+    exit;
+}
+
 $user_id = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM pengguna WHERE pengguna_id = ?");
 $stmt->execute([$user_id]);

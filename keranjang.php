@@ -5,6 +5,11 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'includes/functions.php';
 require_once 'config/db.php';
 
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header('Location: admin/dashboard.php');
+    exit;
+}
+
 // Handle actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';

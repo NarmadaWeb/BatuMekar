@@ -115,6 +115,7 @@ $related_products = $related->fetchAll();
 
                 <!-- Actions -->
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px;">
+                    <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
                     <form action="keranjang.php" method="POST" id="add-to-cart-form">
                         <input type="hidden" name="action" value="add">
                         <input type="hidden" name="product_id" value="<?php echo e($product['produk_id']); ?>">
@@ -124,6 +125,12 @@ $related_products = $related->fetchAll();
                             Tambah ke Keranjang
                         </button>
                     </form>
+                    <?php else: ?>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; padding: 16px; border-radius: 12px; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">admin_panel_settings</span>
+                        Akun Admin tidak diperbolehkan belanja/melakukan pembelian.
+                    </div>
+                    <?php endif; ?>
                     <a href="https://wa.me/6281234567890?text=Halo%20saya%20tertarik%20dengan%20<?php echo e(urlencode($product['nama'])); ?>" target="_blank" 
                        style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #25D366; color: white; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; transition: opacity 0.2s; border: none;"
                        onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">

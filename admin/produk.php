@@ -188,10 +188,6 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="material-symbols-outlined">receipt_long</span>
                     Pesanan
                 </a>
-                <a href="../katalog.php" class="sidebar-link">
-                    <span class="material-symbols-outlined">storefront</span>
-                    Lihat Toko
-                </a>
                 <a href="../logout.php" class="sidebar-link" style="color: var(--error) !important;">
                     <span class="material-symbols-outlined" style="color: var(--error) !important;">logout</span>
                     Keluar

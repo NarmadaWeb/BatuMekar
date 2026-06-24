@@ -89,7 +89,9 @@ require_once __DIR__ . '/../includes/header.php';
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         <?php if (empty($recent_orders)): ?>
                             <p style="color: var(--on-surface-variant); font-size: 14px; margin: 0; padding: 12px 0;">Anda belum melakukan pemesanan apa pun.</p>
-                            <a href="../katalog.php" class="btn btn-primary" style="font-size: 14px; padding: 10px 20px; align-self: flex-start;">Belanja Sekarang</a>
+                            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
+                                <a href="../katalog.php" class="btn btn-primary" style="font-size: 14px; padding: 10px 20px; align-self: flex-start;">Belanja Sekarang</a>
+                            <?php endif; ?>
                         <?php else: ?>
                             <?php foreach ($recent_orders as $order): ?>
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--outline-variant)/20; margin-bottom: 4px;">
@@ -129,9 +131,11 @@ require_once __DIR__ . '/../includes/header.php';
                         <p style="font-size: 14px; color: var(--on-surface-variant); margin-bottom: 24px;">Butuh bantuan atau ingin mengubah informasi detail akun Anda? Pilih opsi di bawah ini untuk melanjutkan.</p>
                         
                         <div style="display: flex; flex-direction: column; gap: 14px;">
-                            <a href="../katalog.php" class="btn btn-primary" style="justify-content: center; font-size: 14px; padding: 12px 20px; text-decoration: none;">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">shopping_cart</span> Belanja Produk Madu
-                            </a>
+                            <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
+                                <a href="../katalog.php" class="btn btn-primary" style="justify-content: center; font-size: 14px; padding: 12px 20px; text-decoration: none;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">shopping_cart</span> Belanja Produk Madu
+                                </a>
+                            <?php endif; ?>
                             <a href="profile.php" class="btn btn-secondary" style="justify-content: center; font-size: 14px; padding: 12px 20px; border-color: var(--primary); color: var(--primary); text-decoration: none;">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">manage_accounts</span> Ubah Informasi Profil
                             </a>
