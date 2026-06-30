@@ -22,6 +22,9 @@ $phone = $_POST['phone'] ?? '';
 $address = $_POST['address'] ?? '';
 $shipping_method = $_POST['shipping_method'] ?? 'Standard';
 $payment_method = $_POST['payment_method'] ?? 'Bank Transfer';
+$latitude = $_POST['latitude'] ?? null;
+$longitude = $_POST['longitude'] ?? null;
+$shipping_cost_post = (int)($_POST['shipping_cost'] ?? 0);
 
 // Calculate total
 list($cart_items, $subtotal, $item_count) = calculate_cart_totals($pdo);
@@ -37,7 +40,7 @@ foreach ($cart_items as $item) {
     ];
 }
 
-$shipping_cost = 25000;
+$shipping_cost = ($shipping_cost_post > 0) ? $shipping_cost_post : 25000;
 $admin_fee = 2000;
 $grand_total = $subtotal + $shipping_cost + $admin_fee;
 
@@ -61,8 +64,8 @@ try {
     $status = ($payment_method === 'COD') ? 'Processed' : 'Pending';
 
     // Insert Order
-    $stmt = $pdo->prepare("INSERT INTO pesanan (pengguna_id, total_harga, metode_pengiriman, metode_pembayaran, alamat_pengiriman, status) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$user_id, $grand_total, $shipping_method, $payment_method, $address, $status]);
+    $stmt = $pdo->prepare("INSERT INTO pesanan (pengguna_id, total_harga, metode_pengiriman, metode_pembayaran, alamat_pengiriman, status, ongkos_kirim, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$user_id, $grand_total, $shipping_method, $payment_method, $address, $status, $shipping_cost, $latitude, $longitude]);
     $order_id = $pdo->lastInsertId();
 
     // Insert Order Items

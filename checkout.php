@@ -5,6 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once 'includes/functions.php';
 require_once 'config/db.php';
 
+// Ensure extra tables and columns exist
+ensure_size_table($pdo);
+
 // Enforce login
 require_login();
 
@@ -28,10 +31,15 @@ require_once 'includes/header.php';
 
 list($cart_items, $subtotal, $item_count) = calculate_cart_totals($pdo);
 
-$shipping_cost = 25000;
+// Default values
+$shipping_cost = 0;
 $admin_fee = 2000;
 $grand_total = $subtotal + $shipping_cost + $admin_fee;
 ?>
+
+<!-- Leaflet Maps CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <main class="py-xl">
     <div class="container">
@@ -53,6 +61,17 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
                         <div style="grid-column: span 2;" class="form-group">
                             <label for="address">Alamat Lengkap</label>
                             <textarea id="address" name="address" class="form-control" rows="3" required style="resize: vertical;"><?php echo e($user['alamat'] ?? ''); ?></textarea>
+                        </div>
+
+                        <!-- Map Selection -->
+                        <div style="grid-column: span 2; margin-top: 16px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Lokasi Pengiriman (Pilih di Peta)</label>
+                            <div id="map" style="height: 300px; border-radius: 12px; border: 1px solid var(--outline-variant);"></div>
+                            <p style="font-size: 12px; color: var(--on-surface-variant); margin-top: 8px;">Geser pin atau klik pada peta untuk menentukan lokasi presisi.</p>
+
+                            <input type="hidden" name="latitude" id="latitude">
+                            <input type="hidden" name="longitude" id="longitude">
+                            <input type="hidden" name="shipping_cost" id="shipping_cost_input" value="0">
                         </div>
                     </div>
                 </section>
@@ -111,11 +130,11 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                             <span>Ongkos Kirim</span>
-                            <span><?php echo e(format_rupiah($shipping_cost)); ?></span>
+                            <span id="shipping_cost_display"><?php echo e(format_rupiah($shipping_cost)); ?></span>
                         </div>
                         <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 20px; margin-top: 12px;">
                             <span>Total</span>
-                            <span class="text-primary"><?php echo e(format_rupiah($grand_total)); ?></span>
+                            <span class="text-primary" id="grand_total_display"><?php echo e(format_rupiah($grand_total)); ?></span>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 24px; padding: 16px; justify-content: center; font-size: 15px;">Konfirmasi & Bayar</button>
@@ -124,5 +143,74 @@ $grand_total = $subtotal + $shipping_cost + $admin_fee;
         </form>
     </div>
 </main>
+
+<script>
+    // Batumekar coordination (Central point)
+    const BATUMEKAR_LAT = -8.5904;
+    const BATUMEKAR_LNG = 116.1772;
+
+    const map = L.map('map').setView([BATUMEKAR_LAT, BATUMEKAR_LNG], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([BATUMEKAR_LAT, BATUMEKAR_LNG], {draggable: true}).addTo(map);
+
+    function updateLocation(lat, lng) {
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+
+        // Calculate distance (simplified Haversine)
+        const distance = calculateDistance(BATUMEKAR_LAT, BATUMEKAR_LNG, lat, lng);
+
+        // Fee calculation: Rp 5.000 per km, min Rp 10.000
+        let fee = Math.round(distance * 5000);
+        if (fee < 10000) fee = 10000;
+
+        const subtotal = <?php echo $subtotal; ?>;
+        const adminFee = <?php echo $admin_fee; ?>;
+        const grandTotal = subtotal + fee + adminFee;
+
+        document.getElementById('shipping_cost_input').value = fee;
+        document.getElementById('shipping_cost_display').textContent = formatRupiah(fee);
+        document.getElementById('grand_total_display').textContent = formatRupiah(grandTotal);
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = deg2rad(lat2-lat1);
+        const dLon = deg2rad(lon2-lon1);
+        const a =
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+            ;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const d = R * c; // Distance in km
+        return d;
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180);
+    }
+
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number).replace('IDR', 'Rp');
+    }
+
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateLocation(e.latlng.lat, e.latlng.lng);
+    });
+
+    marker.on('dragend', function(e) {
+        const position = marker.getLatLng();
+        updateLocation(position.lat, position.lng);
+    });
+
+    // Initial call
+    updateLocation(BATUMEKAR_LAT, BATUMEKAR_LNG);
+</script>
 
 <?php require_once 'includes/footer.php'; ?>

@@ -80,6 +80,24 @@ require_once __DIR__ . '/../includes/header.php';
             <!-- Detailed Grid -->
             <div class="grid <?php echo (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') ? '' : 'grid-2'; ?>">
                 <?php if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin'): ?>
+                <!-- Balance & Recent Orders Card -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                    <!-- Balance Card -->
+                    <div class="card" style="padding: 24px; background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600; opacity: 0.8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Saldo Anda</div>
+                                <div style="font-size: 32px; font-weight: 800; color: #fbbf24;"><?php echo format_rupiah($user['saldo'] ?? 0); ?></div>
+                                <div style="font-size: 12px; opacity: 0.7; margin-top: 12px; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">info</span> Saldo otomatis bertambah jika return disetujui.
+                                </div>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.1); width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 28px; color: #fbbf24;">account_balance_wallet</span>
+                            </div>
+                        </div>
+                    </div>
+
                 <!-- Recent Orders Card -->
                 <div class="card" style="padding: 28px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -125,6 +143,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
+                </div>
                 </div>
                 <?php endif; ?>
 

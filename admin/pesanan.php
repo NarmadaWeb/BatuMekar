@@ -67,8 +67,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 
                 if ($ret_req) {
                     if ($new_status === 'Disetujui') {
+                        // Mark order as Returned
                         $stmt_up_order = $pdo->prepare("UPDATE pesanan SET status = 'Returned' WHERE pesanan_id = ?");
                         $stmt_up_order->execute([$ret_req['pesanan_id']]);
+
+                        // Refund to user saldo
+                        $stmt_order = $pdo->prepare("SELECT pengguna_id, total_harga FROM pesanan WHERE pesanan_id = ?");
+                        $stmt_order->execute([$ret_req['pesanan_id']]);
+                        $order_info = $stmt_order->fetch();
+                        if ($order_info) {
+                            $stmt_refund = $pdo->prepare("UPDATE pengguna SET saldo = saldo + ? WHERE pengguna_id = ?");
+                            $stmt_refund->execute([$order_info['total_harga'], $order_info['pengguna_id']]);
+                        }
                     }
                 }
                 
@@ -253,196 +263,165 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
 
             <!-- Orders List -->
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <?php if (empty($orders)): ?>
-                    <div class="card" style="text-align: center; padding: 48px;">
-                        <span class="material-symbols-outlined" style="font-size: 64px; color: var(--outline); margin-bottom: 16px;">receipt_long</span>
-                        <h2 style="font-size: 20px; color: var(--secondary); margin-bottom: 8px;">Tidak Ada Pesanan</h2>
-                        <p style="color: var(--on-surface-variant);">Belum ada pesanan yang masuk.</p>
-                    </div>
-                <?php else: ?>
-                    <?php foreach ($orders as $order): ?>
-                    <?php
-                        $s = strtolower($order['status'] ?? 'pending');
-                        $badge_style = 'background: #fffbeb; color: #d97706; border: 1px solid #fde68a;';
-                        $status_text = 'Menunggu Pembayaran';
-                        
-                        if ($s === 'completed') {
-                            $badge_style = 'background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;';
-                            $status_text = 'Selesai';
-                        } elseif ($s === 'shipped') {
-                            $badge_style = 'background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd;';
-                            $status_text = 'Dikirim';
-                        } elseif ($s === 'processed') {
-                            $badge_style = 'background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;';
-                            $status_text = 'Diproses';
-                        } elseif ($s === 'returned') {
-                            $badge_style = 'background: #f5f5f4; color: #57534e; border: 1px solid #e7e5e4;';
-                            $status_text = 'Returned';
-                        } elseif ($s === 'cancelled' || $s === 'canceled') {
-                            $badge_style = 'background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5;';
-                            $status_text = 'Dibatalkan';
-                        }
-                    ?>
-                    <div class="order-card" style="border-radius: 16px; background: white; border: 1px solid rgba(0,0,0,0.05); overflow: hidden;">
-                        <div class="order-header" style="background: #f8fafc; padding: 18px 24px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                            <div style="display: flex; align-items: center; gap: 16px;">
-                                <div>
-                                    <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">ID Pesanan</span>
-                                    <div style="font-weight: 800; font-size: 16px; color: var(--primary); margin-top: 2px;">#MBM-<?php echo e($order['pesanan_id']); ?></div>
-                                </div>
-                                <span style="font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 20px; display: inline-block; <?php echo $badge_style; ?>"><?php echo $status_text; ?></span>
-                            </div>
-                            <div style="text-align: right;">
-                                <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Tanggal</span>
-                                <div style="font-weight: 600; font-size: 14px; color: #334155; margin-top: 2px;"><?php echo e(date('d M Y, H:i', strtotime($order['dibuat_pada']))); ?></div>
-                            </div>
-                        </div>
+            <div class="card" style="padding: 0; overflow: hidden; border-radius: 12px;">
+                <div class="table-responsive">
+                    <table class="table" style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                            <tr>
+                                <th style="padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Pesanan</th>
+                                <th style="padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Pelanggan</th>
+                                <th style="padding: 16px 24px; text-align: left; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Status</th>
+                                <th style="padding: 16px 24px; text-align: right; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Total</th>
+                                <th style="padding: 16px 24px; text-align: center; font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($orders)): ?>
+                                <tr>
+                                    <td colspan="5" style="padding: 48px; text-align: center; color: #64748b;">
+                                        <span class="material-symbols-outlined" style="font-size: 48px; display: block; margin-bottom: 12px;">receipt_long</span>
+                                        Tidak ada pesanan ditemukan.
+                                    </td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($orders as $order): ?>
+                                <?php
+                                    $s = strtolower($order['status'] ?? 'pending');
+                                    $badge_style = 'background: #fffbeb; color: #d97706; border: 1px solid #fde68a;';
+                                    $status_text = 'Menunggu Pembayaran';
 
-                        <div class="order-body" style="padding: 24px;">
-                            <!-- Customer Info -->
-                            <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 20px;">
-                                <div style="flex: 1; min-width: 200px;">
-                                    <div style="font-size: 12px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Data Pelanggan</div>
-                                    <div style="font-size: 14px; color: var(--on-surface-variant); line-height: 1.8;">
-                                        <strong>Nama:</strong> <?php echo e($order['user_name']); ?><br>
-                                        <strong>Username:</strong> <?php echo e($order['user_username']); ?><br>
-                                        <strong>Telepon:</strong> <?php echo e($order['user_phone'] ?: '-'); ?>
-                                    </div>
-                                </div>
-                                <div style="flex: 1; min-width: 200px;">
-                                    <div style="font-size: 12px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Detail Pengiriman</div>
-                                    <div style="font-size: 14px; color: var(--on-surface-variant); line-height: 1.8;">
-                                        <strong>Alamat:</strong> <?php echo e($order['alamat_pengiriman']); ?><br>
-                                        <strong>Metode Kirim:</strong> <?php echo e($order['metode_pengiriman']); ?><br>
-                                        <strong>Pembayaran:</strong> <?php echo e($order['metode_pembayaran']); ?>
-                                    </div>
-                                </div>
-                                <div style="min-width: 180px; text-align: right;">
-                                    <div style="font-size: 12px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Total</div>
-                                    <div style="font-size: 24px; font-weight: 800; color: var(--primary);"><?php echo e(format_rupiah($order['total_harga'])); ?></div>
-                                </div>
-                            </div>
-
-                            <!-- Items -->
-                            <?php if (!empty($order['items'])): ?>
-                            <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-bottom: 16px;">
-                                <div style="font-size: 12px; color: var(--secondary); font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Item Pesanan</div>
-                                <?php foreach ($order['items'] as $item): ?>
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
-                                    <div style="display: flex; align-items: center; gap: 12px;">
-                                        <?php if (!empty($item['product_image'])): ?>
-                                            <img src="<?php echo e(img_url($item['product_image'])); ?>" alt="<?php echo e($item['product_name']); ?>" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;">
-                                        <?php endif; ?>
-                                        <div>
-                                            <div style="font-weight: 600; color: #334155; font-size: 14px;"><?php echo e($item['product_name']); ?></div>
-                                            <div style="font-size: 12px; color: #94a3b8;">
-                                                <?php if ($item['ukuran_label']): ?><span style="color: #2563eb; font-weight: 600;"><?php echo e($item['ukuran_label']); ?></span> &middot; <?php endif; ?>
-                                                <?php echo e($item['jumlah']); ?> x <?php echo e(format_rupiah($item['harga'])); ?>
+                                    if ($s === 'completed' || $s === 'selesai') {
+                                        $badge_style = 'background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;';
+                                        $status_text = 'Selesai';
+                                    } elseif ($s === 'shipped') {
+                                        $badge_style = 'background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd;';
+                                        $status_text = 'Dikirim';
+                                    } elseif ($s === 'processed') {
+                                        $badge_style = 'background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;';
+                                        $status_text = 'Diproses';
+                                    } elseif ($s === 'returned') {
+                                        $badge_style = 'background: #f5f5f4; color: #57534e; border: 1px solid #e7e5e4;';
+                                        $status_text = 'Returned';
+                                    } elseif ($s === 'cancelled' || $s === 'canceled') {
+                                        $badge_style = 'background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5;';
+                                        $status_text = 'Dibatalkan';
+                                    }
+                                ?>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 16px 24px;">
+                                        <div style="font-weight: 800; color: var(--primary);">#MBM-<?php echo e($order['pesanan_id']); ?></div>
+                                        <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;"><?php echo e(date('d/m/Y H:i', strtotime($order['dibuat_pada']))); ?></div>
+                                    </td>
+                                    <td style="padding: 16px 24px;">
+                                        <div style="font-weight: 600; color: #334155;"><?php echo e($order['user_name']); ?></div>
+                                        <div style="font-size: 12px; color: #64748b;"><?php echo e($order['user_phone'] ?: '-'); ?></div>
+                                    </td>
+                                    <td style="padding: 16px 24px;">
+                                        <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-block; white-space: nowrap; <?php echo $badge_style; ?>">
+                                            <?php echo $status_text; ?>
+                                        </span>
+                                    </td>
+                                    <td style="padding: 16px 24px; text-align: right; font-weight: 700; color: var(--secondary);">
+                                        <?php echo e(format_rupiah($order['total_harga'])); ?>
+                                    </td>
+                                    <td style="padding: 16px 24px; text-align: center;">
+                                        <button type="button" class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;" onclick="toggleDetail('detail-<?php echo $order['pesanan_id']; ?>')">Detail</button>
+                                    </td>
+                                </tr>
+                                <tr id="detail-<?php echo $order['pesanan_id']; ?>" style="display: none; background: #f8fafc;">
+                                    <td colspan="5" style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;">
+                                            <div>
+                                                <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Alamat Pengiriman</div>
+                                                <div style="font-size: 13px; line-height: 1.6; color: #334155;">
+                                                    <?php echo e($order['alamat_pengiriman']); ?><br>
+                                                    <strong>Metode:</strong> <?php echo e($order['metode_pengiriman']); ?><br>
+                                                    <strong>Pembayaran:</strong> <?php echo e($order['metode_pembayaran']); ?>
+                                                </div>
+                                                <?php if ($order['latitude'] && $order['longitude']): ?>
+                                                    <div style="margin-top: 8px;">
+                                                        <a href="https://www.google.com/maps?q=<?php echo $order['latitude']; ?>,<?php echo $order['longitude']; ?>" target="_blank" style="font-size: 12px; color: #2563eb; display: flex; align-items: center; gap: 4px; text-decoration: none;">
+                                                            <span class="material-symbols-outlined" style="font-size: 16px;">map</span> Lihat di Maps
+                                                        </a>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Item Pesanan</div>
+                                                <?php foreach ($order['items'] as $item): ?>
+                                                    <div style="font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                                                        <span><?php echo e($item['jumlah']); ?>x <?php echo e($item['product_name']); ?> <?php echo $item['ukuran_label'] ? "({$item['ukuran_label']})" : ''; ?></span>
+                                                        <span style="font-weight: 600;"><?php echo e(format_rupiah($item['jumlah'] * $item['harga'])); ?></span>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                                <div style="border-top: 1px solid #cbd5e1; margin-top: 8px; padding-top: 4px; font-size: 13px; display: flex; justify-content: space-between;">
+                                                    <span>Ongkos Kirim:</span>
+                                                    <span><?php echo e(format_rupiah($order['ongkos_kirim'] ?? 0)); ?></span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px;">Aksi Cepat</div>
+                                                <form action="pesanan.php" method="POST" style="margin-bottom: 12px;">
+                                                    <input type="hidden" name="action" value="update_status">
+                                                    <input type="hidden" name="order_id" value="<?php echo $order['pesanan_id']; ?>">
+                                                    <select name="status" class="form-control" style="font-size: 12px; padding: 6px; margin-bottom: 8px;" onchange="this.form.submit()">
+                                                        <option value="Pending" <?php if ($s === 'pending') echo 'selected'; ?> disabled>Menunggu Pembayaran</option>
+                                                        <option value="Processed" <?php if ($s === 'processed') echo 'selected'; ?>>Diproses</option>
+                                                        <option value="Shipped" <?php if ($s === 'shipped') echo 'selected'; ?>>Dikirim</option>
+                                                        <option value="Returned" <?php if ($s === 'returned') echo 'selected'; ?>>Returned / Dikembalikan</option>
+                                                    </select>
+                                                </form>
+                                                <?php if ($order['bukti_pembayaran']): ?>
+                                                    <a href="<?php echo e(img_url($order['bukti_pembayaran'])); ?>" target="_blank" class="btn btn-secondary" style="font-size: 11px; padding: 6px 10px; width: 100%; text-align: center; text-decoration: none; display: block;">Lihat Bukti Bayar</a>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div style="font-weight: 700; color: var(--secondary); font-size: 14px;">
-                                        <?php echo e(format_rupiah($item['jumlah'] * $item['harga'])); ?>
-                                    </div>
-                                </div>
+
+                                        <?php if (!empty($order['return_request'])): ?>
+                                            <div style="margin-top: 20px; padding: 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;">
+                                                <div style="font-weight: 700; color: #92400e; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                                    <span class="material-symbols-outlined" style="font-size: 18px;">assignment_return</span> Pengajuan Return
+                                                </div>
+                                                <p style="font-size: 13px; color: #92400e; margin-bottom: 12px;"><strong>Alasan:</strong> <?php echo e($order['return_request']['alasan']); ?></p>
+                                                <?php if ($order['return_request']['status'] === 'Pending'): ?>
+                                                    <div style="display: flex; gap: 8px;">
+                                                        <form action="pesanan.php" method="POST">
+                                                            <input type="hidden" name="action" value="handle_return">
+                                                            <input type="hidden" name="return_id" value="<?php echo $order['return_request']['pengembalian_id']; ?>">
+                                                            <input type="hidden" name="status" value="Disetujui">
+                                                            <button type="submit" class="btn btn-primary" style="font-size: 11px; padding: 6px 12px; background: #059669; border: none;">Setujui & Refund</button>
+                                                        </form>
+                                                        <form action="pesanan.php" method="POST">
+                                                            <input type="hidden" name="action" value="handle_return">
+                                                            <input type="hidden" name="return_id" value="<?php echo $order['return_request']['pengembalian_id']; ?>">
+                                                            <input type="hidden" name="status" value="Ditolak">
+                                                            <button type="submit" class="btn" style="font-size: 11px; padding: 6px 12px; background: #dc2626; color: white; border: none;">Tolak</button>
+                                                        </form>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #92400e;">Status: <?php echo $order['return_request']['status']; ?></span>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
                                 <?php endforeach; ?>
-                            </div>
                             <?php endif; ?>
-
-                            <!-- Return Request Detail -->
-                            <?php if (!empty($order['return_request'])): 
-                                $ret = $order['return_request'];
-                                $ret_status = $ret['status'];
-                                $ret_bg = '#fef3c7';
-                                $ret_border = '#fde68a';
-                                $ret_fg = '#92400e';
-                                if ($ret_status === 'Disetujui') {
-                                    $ret_bg = '#ecfdf5';
-                                    $ret_border = '#a7f3d0';
-                                    $ret_fg = '#065f46';
-                                } elseif ($ret_status === 'Ditolak') {
-                                    $ret_bg = '#fef2f2';
-                                    $ret_border = '#fca5a5';
-                                    $ret_fg = '#991b1b';
-                                }
-                            ?>
-                            <div style="margin-top: 16px; padding: 18px; border-radius: 12px; background: <?php echo $ret_bg; ?>; border: 1px solid <?php echo $ret_border; ?>; color: <?php echo $ret_fg; ?>; margin-bottom: 16px;">
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <div style="font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 6px; color: <?php echo $ret_fg; ?>;">
-                                        <span class="material-symbols-outlined">assignment_return</span>
-                                        Detail Pengajuan Pengembalian (Return)
-                                    </div>
-                                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px;"><?php echo $ret_status; ?></span>
-                                </div>
-                                <div style="font-size: 14px; line-height: 1.6; margin-bottom: 12px;">
-                                    <strong>Alasan:</strong> <?php echo e($ret['alasan']); ?>
-                                </div>
-                                <div style="margin-bottom: 16px;">
-                                    <strong>Bukti File:</strong><br>
-                                    <?php 
-                                        $file_path = '../' . $ret['bukti_file']; 
-                                        $ext = strtolower(pathinfo($ret['bukti_file'], PATHINFO_EXTENSION));
-                                        $is_video = in_array($ext, ['mp4', 'mov', 'avi', 'webm', '3gp']);
-                                    ?>
-                                    <?php if ($is_video): ?>
-                                        <video src="<?php echo e(img_url($ret['bukti_file'])); ?>" controls style="max-width: 100%; max-height: 240px; border-radius: 8px; margin-top: 8px; border: 1px solid rgba(0,0,0,0.1);"></video>
-                                    <?php else: ?>
-                                        <a href="<?php echo e(img_url($ret['bukti_file'])); ?>" target="_blank" style="display: inline-block; margin-top: 8px;">
-                                            <img src="<?php echo e(img_url($ret['bukti_file'])); ?>" alt="Bukti Return" style="max-width: 100%; max-height: 180px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.1); object-fit: contain;">
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                                
-                                <?php if ($ret_status === 'Pending'): ?>
-                                    <div style="display: flex; gap: 8px;">
-                                        <form action="pesanan.php" method="POST" style="margin: 0;">
-                                            <input type="hidden" name="action" value="handle_return">
-                                            <input type="hidden" name="return_id" value="<?php echo $ret['pengembalian_id']; ?>">
-                                            <input type="hidden" name="status" value="Disetujui">
-                                            <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 6px; background: #059669; border-color: #059669; cursor: pointer; color: white;">
-                                                Setujui Return
-                                            </button>
-                                        </form>
-                                        <form action="pesanan.php" method="POST" style="margin: 0;">
-                                            <input type="hidden" name="action" value="handle_return">
-                                            <input type="hidden" name="return_id" value="<?php echo $ret['pengembalian_id']; ?>">
-                                            <input type="hidden" name="status" value="Ditolak">
-                                            <button type="submit" class="btn" style="padding: 8px 16px; font-size: 12px; font-weight: 700; border-radius: 6px; color: #dc2626; border: 1px solid #fca5a5; background: #fef2f2; cursor: pointer;">
-                                                Tolak Return
-                                            </button>
-                                        </form>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            <?php endif; ?>
-
-                            <!-- Action: Update Status -->
-                            <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                                <form action="pesanan.php" method="POST" style="display: flex; align-items: center; gap: 8px; margin: 0;">
-                                    <input type="hidden" name="action" value="update_status">
-                                    <input type="hidden" name="order_id" value="<?php echo $order['pesanan_id']; ?>">
-                                    <span style="font-size: 12px; font-weight: 600; color: #64748b;">Ubah Status:</span>
-                                    <select name="status" onchange="this.form.submit()" style="padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid #cbd5e1; cursor: pointer; outline: none;">
-                                        <option value="Pending" <?php if ($s === 'pending') echo 'selected'; ?>>Menunggu Pembayaran</option>
-                                        <option value="Processed" <?php if ($s === 'processed') echo 'selected'; ?>>Diproses</option>
-                                        <option value="Shipped" <?php if ($s === 'shipped') echo 'selected'; ?>>Dikirim</option>
-                                        <option value="Completed" <?php if ($s === 'completed') echo 'selected'; ?>>Selesai</option>
-                                        <option value="Returned" <?php if ($s === 'returned') echo 'selected'; ?>>Returned / Dikembalikan</option>
-                                    </select>
-                                </form>
-
-                                <?php if ($order['bukti_pembayaran']): ?>
-                                    <a href="<?php echo e(img_url($order['bukti_pembayaran'])); ?>" target="_blank" class="btn" style="padding: 8px 14px; font-size: 12px; background: #f1f5f9; color: #334155; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">image</span> Lihat Bukti Bayar
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <script>
+                function toggleDetail(id) {
+                    const el = document.getElementById(id);
+                    if (el.style.display === 'none') {
+                        el.style.display = 'table-row';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                }
+            </script>
         </section>
     </div>
 </main>

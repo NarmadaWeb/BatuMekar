@@ -29,11 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt_update = $pdo->prepare("UPDATE pesanan SET status = 'Cancelled' WHERE pesanan_id = ?");
             $stmt_update->execute([$order_id]);
             $success_message = "Pesanan #MBM-{$order_id} berhasil dibatalkan.";
-            // Reload orders to reflect cancellation
+            // Reload orders to reflect changes
             $stmt->execute([$_SESSION['user_id']]);
             $orders = $stmt->fetchAll();
         } else {
             $error_message = "Pesanan tidak dapat dibatalkan.";
+        }
+    } elseif ($_POST['action'] === 'complete_order') {
+        $order_id = (int)$_POST['order_id'];
+        $stmt_check = $pdo->prepare("SELECT * FROM pesanan WHERE pesanan_id = ? AND pengguna_id = ? AND status = 'Shipped'");
+        $stmt_check->execute([$order_id, $_SESSION['user_id']]);
+        $order = $stmt_check->fetch();
+        if ($order) {
+            $stmt_update = $pdo->prepare("UPDATE pesanan SET status = 'Completed' WHERE pesanan_id = ?");
+            $stmt_update->execute([$order_id]);
+            $success_message = "Pesanan #MBM-{$order_id} telah selesai. Terima kasih!";
+            // Reload orders
+            $stmt->execute([$_SESSION['user_id']]);
+            $orders = $stmt->fetchAll();
         }
     }
 }
@@ -166,6 +179,16 @@ require_once __DIR__ . '/../includes/header.php';
                                                 <input type="hidden" name="order_id" value="<?php echo $order['pesanan_id']; ?>">
                                                 <button type="submit" class="btn btn-secondary" style="padding: 8px 16px; font-size: 12px; border-radius: 6px; font-weight: 600; color: #dc2626; border-color: #fca5a5; background: #fef2f2; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #fca5a5;">
                                                     <span class="material-symbols-outlined" style="font-size: 16px;">cancel</span> Batalkan Pesanan
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+
+                                        <?php if ($status === 'shipped'): ?>
+                                            <form action="orders.php" method="POST" onsubmit="return confirm('Konfirmasi bahwa Anda telah menerima pesanan ini?')" style="display:inline; margin:0;">
+                                                <input type="hidden" name="action" value="complete_order">
+                                                <input type="hidden" name="order_id" value="<?php echo $order['pesanan_id']; ?>">
+                                                <button type="submit" class="btn btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: 6px; font-weight: 600; background: #059669; border-color: #059669; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span> Pesanan Selesai
                                                 </button>
                                             </form>
                                         <?php endif; ?>

@@ -128,6 +128,10 @@ function ensure_size_table($pdo) {
                 FOREIGN KEY (pesanan_id) REFERENCES pesanan(pesanan_id) ON DELETE CASCADE,
                 FOREIGN KEY (pengguna_id) REFERENCES pengguna(pengguna_id) ON DELETE CASCADE
             )");
+            $pdo->exec("ALTER TABLE pengguna ADD COLUMN saldo DECIMAL(15,2) DEFAULT 0");
+            $pdo->exec("ALTER TABLE pesanan ADD COLUMN ongkos_kirim DECIMAL(15,2) DEFAULT 0");
+            $pdo->exec("ALTER TABLE pesanan ADD COLUMN latitude TEXT DEFAULT NULL");
+            $pdo->exec("ALTER TABLE pesanan ADD COLUMN longitude TEXT DEFAULT NULL");
         } else {
             $pdo->exec("CREATE TABLE IF NOT EXISTS ulasan_produk (
                 ulasan_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -146,6 +150,10 @@ function ensure_size_table($pdo) {
                 status TEXT DEFAULT 'Pending',
                 dibuat_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
+            try { $pdo->exec("ALTER TABLE pengguna ADD COLUMN saldo REAL DEFAULT 0"); } catch (Exception $e) {}
+            try { $pdo->exec("ALTER TABLE pesanan ADD COLUMN ongkos_kirim REAL DEFAULT 0"); } catch (Exception $e) {}
+            try { $pdo->exec("ALTER TABLE pesanan ADD COLUMN latitude TEXT DEFAULT NULL"); } catch (Exception $e) {}
+            try { $pdo->exec("ALTER TABLE pesanan ADD COLUMN longitude TEXT DEFAULT NULL"); } catch (Exception $e) {}
         }
     } catch (PDOException $e) {}
 }
